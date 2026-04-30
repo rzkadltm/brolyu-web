@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/rzkadltm/brolyu-web/compare/v1.2.0...v1.3.0) (2026-04-30)
+
+
+### Features
+
+* **homepage:** implement dark-mode landing page ([eb01cbd](https://github.com/rzkadltm/brolyu-web/commit/eb01cbd25b247a42f6cbc5542bfeac4d0b89f32d))
+
 # [1.2.0](https://github.com/rzkadltm/brolyu-web/compare/v1.1.0...v1.2.0) (2026-04-30)
 
 
