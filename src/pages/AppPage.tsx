@@ -1,8 +1,413 @@
-function AppPage() {
+import { useState } from 'react'
+
+type TagColor = 'blue' | 'green' | 'purple' | 'amber' | 'rose'
+
+type Speaker = {
+  initial: string
+  color: string
+  name: string
+  speaking?: boolean
+}
+
+type Room = {
+  id: number
+  name: string
+  live: boolean
+  strip: string
+  speakers: Speaker[]
+  tags: { label: string; color: TagColor }[]
+  listeners: number
+  category: string
+  startsIn?: string
+}
+
+const FILTERS = ['All', 'Language', 'Study', 'Games', 'Friends', 'Beginner', 'Advanced']
+
+const ROOMS: Room[] = [
+  {
+    id: 1, name: "Let's talk in English", live: true,
+    strip: 'linear-gradient(90deg,#6366f1,#8b5cf6)',
+    speakers: [
+      { initial: 'H', color: '#6366f1', name: 'Hussein', speaking: true },
+      { initial: 'M', color: '#4b5563', name: 'Monday' },
+      { initial: 'A', color: '#8b5cf6', name: 'Aiko' },
+    ],
+    tags: [{ label: 'English', color: 'blue' }, { label: 'Beginner', color: 'green' }],
+    listeners: 12, category: 'Language',
+  },
+  {
+    id: 2, name: 'Spanish × Japanese Exchange 🌏', live: true,
+    strip: 'linear-gradient(90deg,#0ea5e9,#06b6d4)',
+    speakers: [
+      { initial: 'P', color: '#0ea5e9', name: 'Pablo', speaking: true },
+      { initial: 'Y', color: '#06b6d4', name: 'Yuna' },
+      { initial: 'K', color: '#38bdf8', name: 'Kenji' },
+    ],
+    tags: [{ label: 'Spanish', color: 'rose' }, { label: 'Japanese', color: 'purple' }, { label: 'Exchange', color: 'blue' }],
+    listeners: 8, category: 'Language',
+  },
+  {
+    id: 3, name: 'IELTS Prep — AI Study Hall 📚', live: true,
+    strip: 'linear-gradient(90deg,#f59e0b,#f97316)',
+    speakers: [
+      { initial: 'J', color: '#f59e0b', name: 'Ji-su', speaking: true },
+      { initial: 'S', color: '#f97316', name: 'Sara' },
+    ],
+    tags: [{ label: 'Study', color: 'amber' }, { label: 'IELTS', color: 'blue' }, { label: 'AI Tutor', color: 'purple' }],
+    listeners: 34, category: 'Study',
+  },
+  {
+    id: 4, name: 'Word Blitz Battle 🎮 — Round 7', live: true,
+    strip: 'linear-gradient(90deg,#ec4899,#f43f5e)',
+    speakers: [
+      { initial: 'Z', color: '#ec4899', name: 'Zara', speaking: true },
+      { initial: 'K', color: '#f43f5e', name: 'Kofi' },
+      { initial: 'T', color: '#e11d48', name: 'Tomás' },
+      { initial: 'R', color: '#be185d', name: 'Rin' },
+    ],
+    tags: [{ label: 'Game', color: 'rose' }, { label: 'English', color: 'blue' }, { label: 'Fast-paced', color: 'purple' }],
+    listeners: 6, category: 'Games',
+  },
+  {
+    id: 5, name: 'Chill Korean Corner ☕', live: true,
+    strip: 'linear-gradient(90deg,#8b5cf6,#a78bfa)',
+    speakers: [
+      { initial: 'E', color: '#8b5cf6', name: 'Eun', speaking: true },
+      { initial: 'L', color: '#6366f1', name: 'Lena' },
+      { initial: 'W', color: '#a78bfa', name: 'Woojin' },
+    ],
+    tags: [{ label: 'Korean', color: 'purple' }, { label: 'Casual', color: 'green' }],
+    listeners: 19, category: 'Language',
+  },
+  {
+    id: 6, name: 'Make Friends from Anywhere 🌍', live: true,
+    strip: 'linear-gradient(90deg,#14b8a6,#06b6d4)',
+    speakers: [
+      { initial: 'N', color: '#14b8a6', name: 'Nadia', speaking: true },
+      { initial: 'B', color: '#06b6d4', name: 'Bo' },
+    ],
+    tags: [{ label: 'Friends', color: 'green' }, { label: 'Open', color: 'blue' }],
+    listeners: 27, category: 'Friends',
+  },
+  {
+    id: 7, name: 'French for Beginners 🇫🇷', live: false,
+    strip: 'linear-gradient(90deg,#3b82f6,#60a5fa)',
+    speakers: [
+      { initial: 'C', color: '#3b82f6', name: 'Camille' },
+      { initial: 'D', color: '#60a5fa', name: 'Diego' },
+    ],
+    tags: [{ label: 'French', color: 'blue' }, { label: 'Beginner', color: 'green' }],
+    listeners: 0, category: 'Language', startsIn: 'in 20 min',
+  },
+  {
+    id: 8, name: 'Deep Talks — Philosophy & Life 🧠', live: true,
+    strip: 'linear-gradient(90deg,#6366f1,#06b6d4)',
+    speakers: [
+      { initial: 'A', color: '#6366f1', name: 'Alex', speaking: true },
+      { initial: 'M', color: '#0ea5e9', name: 'Mira' },
+      { initial: 'O', color: '#8b5cf6', name: 'Omar' },
+    ],
+    tags: [{ label: 'Discussion', color: 'purple' }, { label: 'English', color: 'blue' }, { label: 'Advanced', color: 'amber' }],
+    listeners: 41, category: 'Friends',
+  },
+  {
+    id: 9, name: 'Trivia Night — General Knowledge 🏆', live: true,
+    strip: 'linear-gradient(90deg,#f59e0b,#ec4899)',
+    speakers: [
+      { initial: 'T', color: '#f59e0b', name: 'Tiago', speaking: true },
+      { initial: 'I', color: '#ec4899', name: 'Iwa' },
+      { initial: 'K', color: '#f43f5e', name: 'Kim' },
+    ],
+    tags: [{ label: 'Game', color: 'rose' }, { label: 'Trivia', color: 'amber' }, { label: 'All levels', color: 'green' }],
+    listeners: 22, category: 'Games',
+  },
+  {
+    id: 10, name: 'Spanish × Japanese Exchange 🌏', live: true,
+    strip: 'linear-gradient(90deg,#0ea5e9,#06b6d4)',
+    speakers: [
+      { initial: 'P', color: '#0ea5e9', name: 'Pablo', speaking: true },
+      { initial: 'Y', color: '#06b6d4', name: 'Yuna' },
+      { initial: 'K', color: '#38bdf8', name: 'Kenji' },
+    ],
+    tags: [{ label: 'Spanish', color: 'rose' }, { label: 'Japanese', color: 'purple' }, { label: 'Exchange', color: 'blue' }],
+    listeners: 8, category: 'Language',
+  },
+  {
+    id: 11, name: 'IELTS Prep — AI Study Hall 📚', live: true,
+    strip: 'linear-gradient(90deg,#f59e0b,#f97316)',
+    speakers: [
+      { initial: 'J', color: '#f59e0b', name: 'Ji-su', speaking: true },
+      { initial: 'S', color: '#f97316', name: 'Sara' },
+    ],
+    tags: [{ label: 'Study', color: 'amber' }, { label: 'IELTS', color: 'blue' }, { label: 'AI Tutor', color: 'purple' }],
+    listeners: 34, category: 'Study',
+  },
+  {
+    id: 12, name: 'Word Blitz Battle 🎮 — Round 7', live: true,
+    strip: 'linear-gradient(90deg,#ec4899,#f43f5e)',
+    speakers: [
+      { initial: 'Z', color: '#ec4899', name: 'Zara', speaking: true },
+      { initial: 'K', color: '#f43f5e', name: 'Kofi' },
+      { initial: 'T', color: '#e11d48', name: 'Tomás' },
+      { initial: 'R', color: '#be185d', name: 'Rin' },
+    ],
+    tags: [{ label: 'Game', color: 'rose' }, { label: 'English', color: 'blue' }, { label: 'Fast-paced', color: 'purple' }],
+    listeners: 6, category: 'Games',
+  },
+]
+
+const TAG_CLASSES: Record<TagColor, string> = {
+  blue:   'bg-[oklch(62%_0.22_265_/_0.1)] text-accent border-[oklch(62%_0.22_265_/_0.2)]',
+  green:  'bg-[oklch(70%_0.18_152_/_0.1)] text-green border-[oklch(70%_0.18_152_/_0.2)]',
+  purple: 'bg-[oklch(62%_0.22_300_/_0.1)] text-accent2 border-[oklch(62%_0.22_300_/_0.2)]',
+  amber:  'bg-[oklch(75%_0.18_70_/_0.1)] text-[oklch(68%_0.18_70)] border-[oklch(75%_0.18_70_/_0.2)]',
+  rose:   'bg-[oklch(62%_0.22_15_/_0.1)] text-[oklch(62%_0.22_15)] border-[oklch(62%_0.22_15_/_0.2)]',
+}
+
+const WAVE_DELAYS = [0, 0.15, 0.3, 0.15]
+const WAVE_HEIGHTS = [8, 12, 5, 12]
+
+const NAV_ITEMS: { icon: string; active: boolean; badge?: number }[] = [
+  { icon: '🏠', active: false },
+  { icon: '🎙️', active: true },
+  { icon: '💬', active: false, badge: 3 },
+  { icon: '🔍', active: false },
+  { icon: '📚', active: false },
+  { icon: '🎮', active: false },
+]
+
+function RoomCard({ room, index }: { room: Room; index: number }) {
+  const hasSpeaking = room.live && room.speakers.some(s => s.speaking)
+
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <p>app</p>
-    </main>
+    <div className="ap-room-card" style={{ animationDelay: `${index * 0.06}s` }}>
+      <div className="h-[5px] shrink-0" style={{ background: room.strip }} />
+
+      <div className="flex flex-col gap-[14px] p-5 pb-4 flex-1">
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-2">
+          <div
+            className="font-display text-[15px] font-bold tracking-[-0.3px] leading-snug"
+            style={{ color: 'var(--text)' }}
+          >
+            {room.name}
+          </div>
+          {room.live ? (
+            <div
+              className="flex items-center gap-[5px] shrink-0 rounded-full px-[9px] py-[3px] border"
+              style={{ background: 'oklch(70% 0.18 152 / 0.1)', borderColor: 'oklch(70% 0.18 152 / 0.2)' }}
+            >
+              <div className="ap-live-dot" />
+              <span className="text-[10px] font-bold text-green">LIVE</span>
+            </div>
+          ) : (
+            <div
+              className="flex items-center gap-[5px] shrink-0 rounded-full px-[9px] py-[3px] border"
+              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            >
+              <span className="text-[10px] font-semibold" style={{ color: 'var(--text-d)' }}>
+                ⏱ {room.startsIn}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Speakers row */}
+        <div className="flex items-center gap-[10px]">
+          <div className="flex">
+            {room.speakers.map((sp, i) => (
+              <div
+                key={i}
+                className={`ap-speaker-av${sp.speaking ? ' speaking' : ''}`}
+                style={{ background: sp.color, zIndex: room.speakers.length - i }}
+                title={sp.name}
+              >
+                {sp.initial}
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-[2px]">
+            <div className="text-[12px] font-semibold" style={{ color: 'var(--text)' }}>
+              {room.speakers.map(s => s.name).join(', ')}
+            </div>
+            <div
+              className="text-[10px] flex items-center gap-[6px]"
+              style={{ color: 'var(--text-m)' }}
+            >
+              {hasSpeaking && (
+                <>
+                  <div className="flex items-center gap-[2px] h-[14px]">
+                    {WAVE_HEIGHTS.map((h, i) => (
+                      <div
+                        key={i}
+                        className="ap-cw-bar"
+                        style={{ height: `${h}px`, animationDelay: `${WAVE_DELAYS[i]}s` }}
+                      />
+                    ))}
+                  </div>
+                  Speaking
+                </>
+              )}
+              {!room.live && 'Starting soon'}
+            </div>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-[6px]">
+          {room.tags.map((tag, i) => (
+            <span
+              key={i}
+              className={`text-[10px] font-semibold px-[10px] py-[3px] rounded-full border ${TAG_CLASSES[tag.color]}`}
+            >
+              {tag.label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div
+        className="flex items-center justify-between px-5 pb-4 pt-3 border-t"
+        style={{ borderColor: 'var(--border2)' }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-[5px] text-[12px]" style={{ color: 'var(--text-m)' }}>
+            <span className="text-[13px]">🎙️</span>
+            <span>{room.speakers.length} speaking</span>
+          </div>
+          {room.live && (
+            <div className="flex items-center gap-[5px] text-[12px]" style={{ color: 'var(--text-m)' }}>
+              <span className="text-[13px]">👂</span>
+              <span>{room.listeners} listening</span>
+            </div>
+          )}
+        </div>
+        <button className={`ap-join-btn ${room.live ? 'live' : 'soon'}`}>
+          {room.live ? 'Join ↗' : 'Notify me'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AppPage() {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [filter, setFilter] = useState('All')
+  const [search, setSearch] = useState('')
+
+  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'))
+
+  const filtered = ROOMS.filter(room => {
+    const matchFilter =
+      filter === 'All' ||
+      room.category === filter ||
+      room.tags.some(t => t.label.toLowerCase() === filter.toLowerCase())
+    const matchSearch =
+      !search ||
+      room.name.toLowerCase().includes(search.toLowerCase()) ||
+      room.speakers.some(s => s.name.toLowerCase().includes(search.toLowerCase())) ||
+      room.tags.some(t => t.label.toLowerCase().includes(search.toLowerCase()))
+    return matchFilter && matchSearch
+  })
+
+  const liveCount = filtered.filter(r => r.live).length
+
+  return (
+    <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
+      {/* Icon Rail */}
+      <div className="ap-rail">
+        <div className="ap-rail-logo">B</div>
+        <div className="ap-rail-sep" />
+        {NAV_ITEMS.map((item, i) => (
+          <div key={i} className={`ap-rail-btn${item.active ? ' active' : ''}`}>
+            {item.icon}
+            {item.badge !== undefined && (
+              <div className="ap-rail-badge">{item.badge}</div>
+            )}
+          </div>
+        ))}
+        <div className="mt-auto flex flex-col items-center gap-2">
+          <div className="ap-rail-btn" onClick={toggleTheme}>
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </div>
+          <div className="ap-rail-avatar">U</div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        {/* Topbar */}
+        <div className="shrink-0 pt-[22px] px-8">
+          <div className="flex items-center justify-between mb-5">
+            <h1
+              className="font-display text-[26px] font-bold tracking-[-0.8px]"
+              style={{ color: 'var(--text)' }}
+            >
+              Discover <span className="text-accent">Rooms</span>
+            </h1>
+            <div className="flex items-center gap-[10px]">
+              <button className="ap-theme-btn" onClick={toggleTheme}>
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+              <button className="ap-create-btn">＋ Create Room</button>
+            </div>
+          </div>
+
+          {/* Search + Filters */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="ap-search-wrap">
+              <span className="text-[14px]" style={{ color: 'var(--text-d)' }}>🔍</span>
+              <input
+                className="ap-search-input"
+                placeholder="Search rooms, topics, people..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-[7px] flex-wrap">
+              {FILTERS.map(f => (
+                <button
+                  key={f}
+                  className={`ap-chip${filter === f ? ' active' : ''}`}
+                  onClick={() => setFilter(f)}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Rooms scroll */}
+        <div className="ap-rooms-scroll flex-1 overflow-y-auto px-8 pb-8">
+          <div className="ap-section-label">
+            {filter === 'All'
+              ? `${liveCount} live rooms`
+              : `${filtered.length} rooms · ${filter}`}
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {filtered.map((room, i) => (
+              <RoomCard key={room.id} room={room} index={i} />
+            ))}
+          </div>
+          {filtered.length === 0 && (
+            <div
+              className="text-center py-20 text-[14px]"
+              style={{ color: 'var(--text-d)' }}
+            >
+              No rooms found for &ldquo;{search || filter}&rdquo; —{' '}
+              <span
+                className="text-accent cursor-pointer"
+                onClick={() => { setSearch(''); setFilter('All') }}
+              >
+                clear filters
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
