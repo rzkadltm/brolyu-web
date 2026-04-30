@@ -8,11 +8,13 @@ Closes #
 
 ## Type of Change
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Documentation update
-- [ ] Refactor / code quality
-- [ ] Dependency update
+- [ ] `feat` — new user-facing capability
+- [ ] `fix` — bug fix
+- [ ] `refactor` — internal restructuring, no behaviour change
+- [ ] `chore` — tooling, deps, build, CI
+- [ ] `docs` — documentation only
+- [ ] `test` — tests only
+- [ ] `hotfix` — urgent prod fix
 - [ ] Other (describe):
 
 ## Checklist

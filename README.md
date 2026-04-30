@@ -36,7 +36,7 @@ Brolyu is an open-source social platform that brings people together through rea
 
 ```bash
 # Clone the repository
-git clone https://github.com/brolyu/web-frontend.git
+git clone git@github.com:rzkadltm/brolyu-web.git
 cd web-frontend
 
 # Install dependencies

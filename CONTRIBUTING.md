@@ -38,11 +38,11 @@ By participating in this project you agree to abide by our [Code of Conduct](COD
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
-git clone https://github.com/<your-username>/web-frontend.git
+git clone git@github.com:<your-username>/brolyu-web.git
 cd web-frontend
 
 # 2. Add the upstream remote
-git remote add upstream https://github.com/brolyu/web-frontend.git
+git remote add upstream git@github.com:rzkadltm/brolyu-web.git
 
 # 3. Install dependencies
 npm install
@@ -65,13 +65,16 @@ npm run build
 
 ## Branching & Workflow
 
-| Branch | Purpose |
-|---|---|
-| `main` | Stable, always deployable |
-| `feat/<name>` | New features |
-| `fix/<name>` | Bug fixes |
-| `docs/<name>` | Documentation-only changes |
-| `chore/<name>` | Tooling, dependencies, config |
+| Branch | Purpose | Example |
+|---|---|---|
+| `main` | Stable, always deployable | — |
+| `feat/<name>` | New user-facing capability | `feat/user-auth`, `feat/PROJ-142-rate-limiter` |
+| `fix/<name>` | Bug fix | `fix/null-on-empty-payload` |
+| `refactor/<name>` | Internal restructuring, no behaviour change | `refactor/extract-config-loader` |
+| `chore/<name>` | Tooling, deps, build, CI | `chore/bump-nestjs-11.1` |
+| `docs/<name>` | Documentation only | `docs/clarify-e2e-setup` |
+| `test/<name>` | Tests only | `test/cover-app-controller` |
+| `hotfix/<name>` | Urgent prod fix branched off `main` | `hotfix/broken-login-redirect` |
 
 1. Create your branch from the latest `main`:
    ```bash
