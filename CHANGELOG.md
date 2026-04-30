@@ -12,5 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Open-source project structure and documentation (README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, GitHub templates)
 - GitHub Actions CI pipeline running lint and build on every push and PR
 - `/ship` custom slash command (`.claude/commands/ship.md`) — creates a branch, commits using Conventional Commits format, then prompts to push+PR, just push, or keep local
+- `CLAUDE.md` — codebase guide for Claude Code covering commands, architecture, env vars, code conventions, and git workflow
 
 [Unreleased]: https://github.com/rzkadltm/brolyu-web/compare/HEAD...HEAD
