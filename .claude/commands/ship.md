@@ -54,25 +54,7 @@ Rules:
 
 Run: `git checkout -b <branch-name>`
 
-## Step 4 — Update CHANGELOG.md
-
-Before committing, update `CHANGELOG.md` under the `## [Unreleased]` section to reflect the changes being shipped:
-
-- Add a bullet under the appropriate sub-heading (`### Added`, `### Changed`, `### Fixed`, `### Removed`) based on the commit type(s).
-- Keep the entry concise — one line per logical change, written for a human reader (not a git log).
-- If `## [Unreleased]` or the relevant sub-heading doesn't exist yet, create it.
-- The CHANGELOG edit must be included in the relevant commit (bundle it with the change it describes). Do **not** make a standalone `docs:` commit for it unless the only thing being shipped is a docs change.
-
-Example entry formats:
-```
-### Added
-- `/ship` command — branches, commits, and prompts to push or open a PR
-
-### Fixed
-- Null pointer in user profile loader when email is missing
-```
-
-## Step 5 — Commit each logical group (including CHANGELOG)
+## Step 4 — Commit each logical group
 
 For each group:
 
@@ -108,7 +90,7 @@ git status
 
 4. Repeat for any remaining groups.
 
-## Step 6 — Ask the user what to do next
+## Step 5 — Ask the user what to do next
 
 After all commits are done, output exactly this question (substituting the real branch name):
 
