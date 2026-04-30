@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Brolyu — Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Connect, learn, and play together through voice, video, and screen sharing.
 
-Currently, two official plugins are available:
+Brolyu is an open-source social platform that brings people together through real-time communication. Make new friends, practice languages with native speakers, play games side by side, and share your screen — all in one place.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Voice & Video Calls** — High-quality peer-to-peer calls powered by WebRTC
+- **Screen Sharing** — Share your screen for gaming, studying, or co-working sessions
+- **Language Learning** — Connect with native speakers and language partners worldwide
+- **Game Together** — Join rooms to play, watch, and react together in real time
+- **Friend Discovery** — Find people who share your interests, language goals, or favourite games
+- **Rooms & Communities** — Create public or private rooms around any topic
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Layer | Technology |
+|---|---|
+| UI Framework | React 19 + TypeScript |
+| Build Tool | Vite |
+| Styling | CSS Modules |
+| Real-time | WebRTC (planned) |
+| Linting | ESLint + typescript-eslint |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- [Node.js](https://nodejs.org/) >= 20
+- [npm](https://www.npmjs.com/) >= 10 (or your preferred package manager)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone git@github.com:rzkadltm/brolyu-web.git
+cd web-frontend
+
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env.local
+
+# Start the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Available Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server with HMR |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint across the codebase |
+
+## Project Structure
+
 ```
+web-frontend/
+├── public/           # Static assets (favicon, svg sprites)
+├── src/
+│   ├── assets/       # Images and icons imported by components
+│   ├── App.tsx       # Root application component
+│   ├── App.css       # Root styles
+│   ├── main.tsx      # Entry point
+│   └── index.css     # Global styles
+├── index.html        # HTML shell
+├── vite.config.ts    # Vite configuration
+└── tsconfig.json     # TypeScript configuration
+```
+
+## Contributing
+
+We welcome contributions of all kinds — bug fixes, new features, documentation improvements, translations, and more. Please read our [Contributing Guide](CONTRIBUTING.md) to get started and our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
+
+## Security
+
+Found a vulnerability? Please follow our [Security Policy](SECURITY.md) and do **not** open a public issue.
+
+## License
+
+Brolyu is open source software licensed under the [MIT License](LICENSE).
+
+---
+
+Made with care by the Brolyu community.
