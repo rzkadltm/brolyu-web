@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/rzkadltm/brolyu-web/compare/v1.0.0...v1.1.0) (2026-04-30)
+
+
+### Features
+
+* **ui:** migrate to Tailwind CSS v4 ([359dc1d](https://github.com/rzkadltm/brolyu-web/commit/359dc1ddf64baef7c88eaa808b86848e84cb9655))
+
 # 1.0.0 (2026-04-30)
 
 
