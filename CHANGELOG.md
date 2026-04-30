@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/rzkadltm/brolyu-web/compare/v1.1.0...v1.2.0) (2026-04-30)
+
+
+### Features
+
+* **routing:** add react-router-dom with home and app routes ([edfac28](https://github.com/rzkadltm/brolyu-web/commit/edfac286b87394c19cc1705ac9d0c89ef544d805))
+
 # [1.1.0](https://github.com/rzkadltm/brolyu-web/compare/v1.0.0...v1.1.0) (2026-04-30)
 
 
