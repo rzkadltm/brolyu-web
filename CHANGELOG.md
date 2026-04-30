@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/rzkadltm/brolyu-web/compare/v1.3.0...v1.4.0) (2026-04-30)
+
+
+### Features
+
+* **app:** implement rooms discovery page ([c5dd785](https://github.com/rzkadltm/brolyu-web/commit/c5dd785e1e621bc0d0f72c507f7fbd18a883a022))
+
 # [1.3.0](https://github.com/rzkadltm/brolyu-web/compare/v1.2.0...v1.3.0) (2026-04-30)
 
 
