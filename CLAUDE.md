@@ -27,7 +27,7 @@ Copy `.env.example` to `.env.local` and fill in values. All env vars must be pre
 
 React 19 + TypeScript SPA built with Vite. Entry point is `src/main.tsx` → `src/App.tsx`.
 
-Styling uses **CSS Modules** (scoped per component). Avoid global class names. Global resets and design tokens live in `src/index.css`.
+Styling uses **Tailwind CSS v4** (via `@tailwindcss/vite`). Use Tailwind utility classes directly in JSX. Design tokens (colors, shadows, fonts) are defined in `@theme` in `src/index.css` and are available as both Tailwind utilities (e.g. `text-accent`, `bg-border`) and CSS variables (e.g. `var(--color-accent)`). Dark mode is handled via `@media (prefers-color-scheme: dark)` overriding the same CSS variables. Only add CSS to `src/index.css` `@layer base` for styles that genuinely cannot be expressed as utilities (e.g. pseudo-element tricks, element-level resets).
 
 Static assets imported directly by components go in `src/assets/`. Files served as-is (no import required) go in `public/`. The SVG icon system uses a sprite at `public/icons.svg` consumed via `<use href="/icons.svg#<id>">`.
 
@@ -41,7 +41,7 @@ WebRTC (voice/video/screen share) is **planned but not yet implemented** — the
 
 **Imports order** — external packages → internal modules → styles.
 
-**CSS** — CSS Modules or scoped styles only.
+**CSS** — Tailwind utility classes in JSX. No CSS Modules or separate `.css` files per component. Scoped overrides go in `src/index.css` `@layer base` only when necessary.
 
 ## Git Workflow
 

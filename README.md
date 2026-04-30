@@ -21,7 +21,7 @@ Brolyu is an open-source social platform that brings people together through rea
 |---|---|
 | UI Framework | React 19 + TypeScript |
 | Build Tool | Vite |
-| Styling | CSS Modules |
+| Styling | Tailwind CSS v4 |
 | Real-time | WebRTC (planned) |
 | Linting | ESLint + typescript-eslint |
 
@@ -68,9 +68,8 @@ web-frontend/
 ├── src/
 │   ├── assets/       # Images and icons imported by components
 │   ├── App.tsx       # Root application component
-│   ├── App.css       # Root styles
 │   ├── main.tsx      # Entry point
-│   └── index.css     # Global styles
+│   └── index.css     # Tailwind import + global base styles
 ├── index.html        # HTML shell
 ├── vite.config.ts    # Vite configuration
 └── tsconfig.json     # TypeScript configuration
