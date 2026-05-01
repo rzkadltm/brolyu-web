@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/rzkadltm/brolyu-web/compare/v1.9.1...v1.10.0) (2026-05-01)
+
+
+### Features
+
+* **messages:** implement messages page on AppShell layout ([#5](https://github.com/rzkadltm/brolyu-web/issues/5)) ([43eaf0c](https://github.com/rzkadltm/brolyu-web/commit/43eaf0c20a7b8df0be0caf7a7bbc41a3a578d4b9))
+
 ## [1.9.1](https://github.com/rzkadltm/brolyu-web/compare/v1.9.0...v1.9.1) (2026-05-01)
 
 
