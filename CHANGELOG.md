@@ -1,3 +1,11 @@
+# [1.9.0](https://github.com/rzkadltm/brolyu-web/compare/v1.8.0...v1.9.0) (2026-05-01)
+
+
+### Features
+
+* **room:** add collapsible sidebar with seam toggle button ([9c16ee2](https://github.com/rzkadltm/brolyu-web/commit/9c16ee2615ea026e2e32016998958f19c3b73455))
+* **room:** hide chat panel on join, toggle via chat button ([6dfdb69](https://github.com/rzkadltm/brolyu-web/commit/6dfdb69da0d113cfc39ef52346365b94aa278f29))
+
 # [1.8.0](https://github.com/rzkadltm/brolyu-web/compare/v1.7.1...v1.8.0) (2026-05-01)
 
 
