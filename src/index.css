@@ -264,7 +264,7 @@
 
   /* ── ROOM PAGE ── */
   .rp-sidebar {
-    width: 300px; flex-shrink: 0;
+    width: 300px; flex-shrink: 0; height: 100%;
     background: var(--bg2); border-right: 1px solid var(--border);
     display: flex; flex-direction: column; overflow: hidden;
   }
