@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Chip from '../components/Chip/Chip'
-import IconRail from '../components/IconRail/IconRail'
-import { useTheme } from '../contexts/useTheme'
 import { ROOMS } from '../data/rooms'
 import type { Room, TagColor } from '../data/rooms'
 
@@ -116,7 +114,6 @@ function SidebarRoomCard({ room, active, onClick }: { room: Room; active: boolea
 
 function RoomPage() {
   const { id } = useParams<{ id: string }>()
-  const { theme } = useTheme()
   const navigate = useNavigate()
 
   const room = ROOMS.find(r => r.id === Number(id))
@@ -179,7 +176,7 @@ function RoomPage() {
 
   if (!room) {
     return (
-      <div className="ap-root flex h-screen items-center justify-center flex-col gap-4" data-theme={theme}>
+      <div className="flex flex-1 items-center justify-center flex-col gap-4">
         <div className="font-display text-2xl font-bold" style={{ color: 'var(--text)' }}>Room not found</div>
         <button type="button" className="text-accent text-sm" onClick={() => navigate('/app')}>
           ← Back to rooms
@@ -193,10 +190,7 @@ function RoomPage() {
   const extraListeners = Math.max(0, room.listeners - visibleListeners.length)
 
   return (
-    <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
-      <IconRail />
-
-      <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 overflow-hidden">
         {/* Sidebar — room list */}
         <div className="relative flex-shrink-0" style={{ width: sidebarOpen ? 300 : 0 }}>
           {sidebarOpen && (
@@ -361,7 +355,6 @@ function RoomPage() {
           </div>
         </div>}
       </div>
-    </div>
   )
 }
 

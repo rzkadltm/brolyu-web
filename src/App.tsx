@@ -17,8 +17,8 @@ function App() {
         <Route element={<AppShell />}>
           <Route path="/app" element={<DiscoverPage />} />
           <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/room/:id" element={<RoomPageKeyed />} />
         </Route>
-        <Route path="/room/:id" element={<RoomPageKeyed />} />
       </Routes>
     </BrowserRouter>
   )
