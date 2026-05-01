@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/rzkadltm/brolyu-web/compare/v1.12.0...v1.13.0) (2026-05-01)
+
+
+### Features
+
+* **routing:** wire prototype pages with auth guard ([402377b](https://github.com/rzkadltm/brolyu-web/commit/402377ba8aa3a686edfa27075c08ff477b0e3fac))
+
 # [1.12.0](https://github.com/rzkadltm/brolyu-web/compare/v1.11.0...v1.12.0) (2026-05-01)
 
 
