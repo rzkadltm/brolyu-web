@@ -130,7 +130,7 @@ function RoomPage() {
   const [msgs, setMsgs] = useState<ChatMessage[]>(() => room ? buildInitialMessages(room) : [])
   const [inputVal, setInputVal] = useState('')
   const [copied, setCopied] = useState(false)
-  const msgsEndRef = useRef<HTMLDivElement>(null)
+  const msgsContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!room) return
@@ -139,7 +139,8 @@ function RoomPage() {
   }, [room])
 
   useEffect(() => {
-    msgsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const el = msgsContainerRef.current
+    if (el) el.scrollTop = el.scrollHeight
   }, [msgs])
 
   function copyLink() {
@@ -316,7 +317,7 @@ function RoomPage() {
           <div className="rp-chat-header">
             <div className="rp-chat-header-title">Room Chat</div>
           </div>
-          <div className="rp-chat-messages">
+          <div className="rp-chat-messages" ref={msgsContainerRef}>
             {msgs.map((m, i) => {
               if (m.type === 'sys') {
                 return <div key={m.id ?? i} className="rp-sys-msg">{m.text}</div>
@@ -347,7 +348,6 @@ function RoomPage() {
                 </div>
               )
             })}
-            <div ref={msgsEndRef} />
           </div>
           <div className="rp-chat-input-row">
             <input
