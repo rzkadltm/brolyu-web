@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/rzkadltm/brolyu-web/compare/v1.4.0...v1.5.0) (2026-05-01)
+
+
+### Features
+
+* **room:** implement room page with voice chat UI ([71c809c](https://github.com/rzkadltm/brolyu-web/commit/71c809c621be3dd6246cba3ea9bb645c358bd42f))
+
 # [1.4.0](https://github.com/rzkadltm/brolyu-web/compare/v1.3.0...v1.4.0) (2026-04-30)
 
 
