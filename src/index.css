@@ -268,6 +268,17 @@
     background: var(--bg2); border-right: 1px solid var(--border);
     display: flex; flex-direction: column; overflow: hidden;
   }
+  .rp-sidebar-toggle {
+    position: absolute; top: 50%; right: 0;
+    transform: translate(50%, -50%);
+    z-index: 10; width: 28px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg4); border: 1px solid var(--border);
+    border-radius: 9999px; cursor: pointer; font-size: 16px;
+    color: var(--text-m); transition: background 0.15s, color 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .rp-sidebar-toggle:hover { background: var(--bg3); color: var(--text); }
   .rp-sidebar-header {
     padding: 18px 18px 12px; border-bottom: 1px solid var(--border2);
   }

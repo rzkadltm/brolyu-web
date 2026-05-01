@@ -124,6 +124,7 @@ function RoomPage() {
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
   const [sidebarSearch, setSidebarSearch] = useState('')
   const [chatOpen, setChatOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [muted, setMuted] = useState(false)
   const [activeSpeaker, setActiveSpeaker] = useState(0)
   const [msgs, setMsgs] = useState<ChatMessage[]>(() => room ? buildInitialMessages(room) : [])
@@ -196,36 +197,48 @@ function RoomPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar — room list */}
-        <div className="rp-sidebar">
-          <div className="rp-sidebar-header">
-            <div className="rp-sidebar-title">Voice Rooms</div>
-            <div className="rp-search-bar">
-              <span style={{ fontSize: 14, color: 'var(--text-d)', flexShrink: 0 }}>🔍</span>
-              <input
-                className="rp-search-input"
-                placeholder="Search rooms..."
-                value={sidebarSearch}
-                onChange={e => setSidebarSearch(e.target.value)}
-              />
+        <div className="relative flex-shrink-0" style={{ width: sidebarOpen ? 300 : 0 }}>
+          {sidebarOpen && (
+            <div className="rp-sidebar">
+              <div className="rp-sidebar-header">
+                <div className="rp-sidebar-title">Voice Rooms</div>
+                <div className="rp-search-bar">
+                  <span style={{ fontSize: 14, color: 'var(--text-d)', flexShrink: 0 }}>🔍</span>
+                  <input
+                    className="rp-search-input"
+                    placeholder="Search rooms..."
+                    value={sidebarSearch}
+                    onChange={e => setSidebarSearch(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="rp-filter-row">
+                {SIDEBAR_FILTERS.map(f => (
+                  <Chip key={f} active={sidebarFilter === f} onClick={() => setSidebarFilter(f)}>
+                    {f}
+                  </Chip>
+                ))}
+              </div>
+              <div className="rp-room-list">
+                {filteredSidebar.map(r => (
+                  <SidebarRoomCard
+                    key={r.id}
+                    room={r}
+                    active={r.id === room.id}
+                    onClick={() => navigate(`/room/${r.id}`)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="rp-filter-row">
-            {SIDEBAR_FILTERS.map(f => (
-              <Chip key={f} active={sidebarFilter === f} onClick={() => setSidebarFilter(f)}>
-                {f}
-              </Chip>
-            ))}
-          </div>
-          <div className="rp-room-list">
-            {filteredSidebar.map(r => (
-              <SidebarRoomCard
-                key={r.id}
-                room={r}
-                active={r.id === room.id}
-                onClick={() => navigate(`/room/${r.id}`)}
-              />
-            ))}
-          </div>
+          )}
+          <button
+            type="button"
+            className="rp-sidebar-toggle"
+            aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+            onClick={() => setSidebarOpen(o => !o)}
+          >
+            {sidebarOpen ? '‹' : '›'}
+          </button>
         </div>
 
         {/* Stage */}
