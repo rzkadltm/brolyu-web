@@ -1,3 +1,11 @@
+## [1.9.1](https://github.com/rzkadltm/brolyu-web/compare/v1.9.0...v1.9.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* **room:** scroll chat container directly instead of sentinel div ([efd1624](https://github.com/rzkadltm/brolyu-web/commit/efd1624065319240a83f4c8d55676dcf50468762))
+* **room:** set sidebar to full height ([4ad06e5](https://github.com/rzkadltm/brolyu-web/commit/4ad06e582cc0f98633ad60859c3b99bc7ac046f8))
+
 # [1.9.0](https://github.com/rzkadltm/brolyu-web/compare/v1.8.0...v1.9.0) (2026-05-01)
 
 
