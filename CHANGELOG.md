@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/rzkadltm/brolyu-web/compare/v1.6.0...v1.7.0) (2026-05-01)
+
+
+### Features
+
+* **auth:** implement sign in and sign up page ([df824d0](https://github.com/rzkadltm/brolyu-web/commit/df824d0b5fd8f379188eae173f4b58edd50346a4))
+
 # [1.6.0](https://github.com/rzkadltm/brolyu-web/compare/v1.5.0...v1.6.0) (2026-05-01)
 
 
