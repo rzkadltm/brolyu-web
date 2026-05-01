@@ -1,9 +1,16 @@
-import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import AppShell from './layouts/AppShell'
-import DiscoverPage from './features/discover/DiscoverPage'
-import MessagesPage from './features/messages/MessagesPage'
-import RoomPage from './pages/RoomPage'
-import HomePage from './pages/HomePage'
+import HomePage from './prototypes/HomePage'
+import AuthPage from './prototypes/AuthPage'
+import AppPage from './prototypes/AppPage'
+import MessagesPage from './prototypes/MessagesPage'
+import RoomPage from './prototypes/RoomPage'
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const token = localStorage.getItem('auth_token')
+  if (!token) return <Navigate to="/auth" replace />
+  return <>{children}</>
+}
 
 function RoomPageKeyed() {
   const { id } = useParams()
@@ -15,8 +22,15 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route element={<AppShell />}>
-          <Route path="/app" element={<DiscoverPage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppShell />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/app" element={<AppPage />} />
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/room/:id" element={<RoomPageKeyed />} />
         </Route>

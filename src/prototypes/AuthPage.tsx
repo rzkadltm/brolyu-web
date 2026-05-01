@@ -97,7 +97,7 @@ function SignInForm({ onSwitch }: SignInFormProps) {
         <div className="auth-success-icon">✓</div>
         <div className="auth-success-title">Welcome back!</div>
         <div className="auth-success-sub">Signing you into Brolyu…<br />Redirecting to your rooms.</div>
-        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => navigate('/app')}>
+        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => { localStorage.setItem('auth_token', 'demo'); navigate('/app') }}>
           Go to Rooms →
         </button>
       </div>
@@ -244,7 +244,7 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
         <div className="auth-success-icon">🎉</div>
         <div className="auth-success-title">You're in{firstName ? `, ${firstName}` : ''}!</div>
         <div className="auth-success-sub">Your Brolyu account is ready.<br />Let's find you some rooms to join.</div>
-        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => navigate('/app')}>
+        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => { localStorage.setItem('auth_token', 'demo'); navigate('/app') }}>
           Explore Rooms →
         </button>
       </div>
