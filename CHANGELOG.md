@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/rzkadltm/brolyu-web/compare/v1.5.0...v1.6.0) (2026-05-01)
+
+
+### Features
+
+* **messages:** implement messages page with chat UI ([4d6c865](https://github.com/rzkadltm/brolyu-web/commit/4d6c8650a563bf34a6d32a39ca377d36cc0e948b))
+
 # [1.5.0](https://github.com/rzkadltm/brolyu-web/compare/v1.4.0...v1.5.0) (2026-05-01)
 
 
