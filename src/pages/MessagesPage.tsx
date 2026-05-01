@@ -92,8 +92,7 @@ const INITIAL_MSGS: Msg[] = [
 const VOICE_HEIGHTS = [6, 10, 14, 8, 18, 10, 6, 14, 9, 16, 7, 12, 18, 8, 10, 14, 6]
 
 const NAV_ITEMS: Array<{ icon: string; route: string | null; active?: true }> = [
-  { icon: '🏠', route: '/' },
-  { icon: '🎙️', route: '/app' },
+  { icon: '🏠', route: '/app' },
   { icon: '💬', route: '/messages', active: true },
   { icon: '🔍', route: null },
   { icon: '📚', route: null },

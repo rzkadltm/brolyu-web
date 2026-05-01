@@ -171,12 +171,11 @@ export default function RoomPage() {
   })
 
   const NAV_ITEMS = [
-    { icon: '🏠', active: false },
-    { icon: '🎙️', active: true },
-    { icon: '💬', active: false, badge: 3 },
-    { icon: '🔍', active: false },
-    { icon: '📚', active: false },
-    { icon: '🎮', active: false },
+    { icon: '🏠', active: false, route: '/app' },
+    { icon: '💬', active: false, badge: 3, route: '/messages' },
+    { icon: '🔍', active: false, route: null },
+    { icon: '📚', active: false, route: null },
+    { icon: '🎮', active: false, route: null },
   ]
 
   if (!room) {
@@ -197,12 +196,12 @@ export default function RoomPage() {
 
       {/* Icon Rail */}
       <div className="ap-rail">
-        <Link to="/" style={{ textDecoration: 'none' }}>
+        <Link to="/app" style={{ textDecoration: 'none' }}>
           <div className="ap-rail-logo">B</div>
         </Link>
         <div className="ap-rail-sep" />
         {NAV_ITEMS.map((item, i) => (
-          <div key={i} className={`ap-rail-btn${item.active ? ' active' : ''}`}>
+          <div key={i} className={`ap-rail-btn${item.active ? ' active' : ''}`} onClick={() => { if (item.route) navigate(item.route) }}>
             {item.icon}
             {item.badge !== undefined && <div className="ap-rail-badge">{item.badge}</div>}
           </div>

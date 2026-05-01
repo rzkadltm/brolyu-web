@@ -17,8 +17,7 @@ const WAVE_DELAYS = [0, 0.15, 0.3, 0.15]
 const WAVE_HEIGHTS = [8, 12, 5, 12]
 
 const NAV_ITEMS: { icon: string; active: boolean; badge?: number; route?: string }[] = [
-  { icon: '🏠', active: false, route: '/' },
-  { icon: '🎙️', active: true },
+  { icon: '🏠', active: true, route: '/app' },
   { icon: '💬', active: false, badge: 3, route: '/messages' },
   { icon: '🔍', active: false },
   { icon: '📚', active: false },
