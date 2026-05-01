@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
-import AppPage from './pages/AppPage'
+import AppShell from './layouts/AppShell'
+import DiscoverPage from './features/discover/DiscoverPage'
+import MessagesPage from './features/messages/MessagesPage'
 import RoomPage from './pages/RoomPage'
 
 function RoomPageKeyed() {
@@ -12,7 +14,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/app" replace />} />
-        <Route path="/app" element={<AppPage />} />
+        <Route element={<AppShell />}>
+          <Route path="/app" element={<DiscoverPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+        </Route>
         <Route path="/room/:id" element={<RoomPageKeyed />} />
       </Routes>
     </BrowserRouter>
