@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/rzkadltm/brolyu-web/compare/v1.13.0...v1.13.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* **routing:** remove AppShell wrapper to fix duplicate icon rail ([1c1790b](https://github.com/rzkadltm/brolyu-web/commit/1c1790bc543f73e57930c8ee78fd74571c32e935))
+
 # [1.13.0](https://github.com/rzkadltm/brolyu-web/compare/v1.12.0...v1.13.0) (2026-05-01)
 
 
