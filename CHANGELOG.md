@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/rzkadltm/brolyu-web/compare/v1.7.0...v1.7.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* **nav:** route home to discover rooms and remove mic icon ([7359bdd](https://github.com/rzkadltm/brolyu-web/commit/7359bdd087761c12c21767d1920e48d4cfdde0cc))
+
 # [1.7.0](https://github.com/rzkadltm/brolyu-web/compare/v1.6.0...v1.7.0) (2026-05-01)
 
 
