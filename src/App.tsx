@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
 
 import AppPage from './pages/AppPage'
 import HomePage from './pages/HomePage'
+import MessagesPage from './pages/MessagesPage'
 import RoomPage from './pages/RoomPage'
 
 function RoomPageKeyed() {
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/app" element={<AppPage />} />
+        <Route path="/messages" element={<MessagesPage />} />
         <Route path="/room/:id" element={<RoomPageKeyed />} />
       </Routes>
     </BrowserRouter>

@@ -16,10 +16,10 @@ const TAG_CLASSES: Record<TagColor, string> = {
 const WAVE_DELAYS = [0, 0.15, 0.3, 0.15]
 const WAVE_HEIGHTS = [8, 12, 5, 12]
 
-const NAV_ITEMS: { icon: string; active: boolean; badge?: number }[] = [
-  { icon: '🏠', active: false },
+const NAV_ITEMS: { icon: string; active: boolean; badge?: number; route?: string }[] = [
+  { icon: '🏠', active: false, route: '/' },
   { icon: '🎙️', active: true },
-  { icon: '💬', active: false, badge: 3 },
+  { icon: '💬', active: false, badge: 3, route: '/messages' },
   { icon: '🔍', active: false },
   { icon: '📚', active: false },
   { icon: '🎮', active: false },
@@ -145,6 +145,7 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
 }
 
 function AppPage() {
+  const navigate = useNavigate()
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
@@ -173,7 +174,11 @@ function AppPage() {
         <div className="ap-rail-logo">B</div>
         <div className="ap-rail-sep" />
         {NAV_ITEMS.map((item, i) => (
-          <div key={i} className={`ap-rail-btn${item.active ? ' active' : ''}`}>
+          <div
+            key={i}
+            className={`ap-rail-btn${item.active ? ' active' : ''}`}
+            onClick={() => { if (item.route) navigate(item.route) }}
+          >
             {item.icon}
             {item.badge !== undefined && (
               <div className="ap-rail-badge">{item.badge}</div>
