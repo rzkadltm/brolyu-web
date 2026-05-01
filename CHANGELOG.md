@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/rzkadltm/brolyu-web/compare/v1.10.0...v1.11.0) (2026-05-01)
+
+
+### Features
+
+* **release:** add Cloudflare Workers configuration ([#4](https://github.com/rzkadltm/brolyu-web/issues/4)) ([95e3c23](https://github.com/rzkadltm/brolyu-web/commit/95e3c23398561b17fd79c69b67991b453e067823))
+
 # [1.10.0](https://github.com/rzkadltm/brolyu-web/compare/v1.9.1...v1.10.0) (2026-05-01)
 
 
