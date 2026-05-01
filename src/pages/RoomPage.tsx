@@ -123,6 +123,7 @@ function RoomPage() {
 
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
   const [sidebarSearch, setSidebarSearch] = useState('')
+  const [chatOpen, setChatOpen] = useState(false)
   const [muted, setMuted] = useState(false)
   const [activeSpeaker, setActiveSpeaker] = useState(0)
   const [msgs, setMsgs] = useState<ChatMessage[]>(() => room ? buildInitialMessages(room) : [])
@@ -291,14 +292,14 @@ function RoomPage() {
             >
               {muted ? '🔇' : '🎙️'}
             </button>
-            <button type="button" className="rp-ctrl-btn active" aria-label="Chat">💬</button>
+            <button type="button" className={`rp-ctrl-btn${chatOpen ? ' active' : ''}`} aria-label="Chat" onClick={() => setChatOpen(o => !o)}>💬</button>
             <button type="button" className="rp-ctrl-btn" aria-label="AI tools">🤖</button>
             <button type="button" className="rp-ctrl-btn danger" aria-label="End">📵</button>
           </div>
         </div>
 
         {/* Chat */}
-        <div className="rp-chat-panel">
+        {chatOpen && <div className="rp-chat-panel">
           <div className="rp-chat-header">
             <div className="rp-chat-header-title">Room Chat</div>
           </div>
@@ -345,7 +346,7 @@ function RoomPage() {
             />
             <button type="button" className="rp-send-btn" onClick={sendMsg}>➤</button>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   )
