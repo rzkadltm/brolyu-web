@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/rzkadltm/brolyu-web/compare/v1.7.1...v1.8.0) (2026-05-01)
+
+
+### Features
+
+* **app:** restructure into feature-based architecture and add discover page ([3a0b8d9](https://github.com/rzkadltm/brolyu-web/commit/3a0b8d986accb7c23e10c3e75804ab6d84070db2))
+
 ## [1.7.1](https://github.com/rzkadltm/brolyu-web/compare/v1.7.0...v1.7.1) (2026-05-01)
 
 
