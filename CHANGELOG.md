@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/rzkadltm/brolyu-web/compare/v1.11.0...v1.12.0) (2026-05-01)
+
+
+### Features
+
+* **home:** add homepage prototype at root route ([#6](https://github.com/rzkadltm/brolyu-web/issues/6)) ([bbd47ff](https://github.com/rzkadltm/brolyu-web/commit/bbd47ff96ce48fa4cd57e7fd3bf8662d65714f01))
+
 # [1.11.0](https://github.com/rzkadltm/brolyu-web/compare/v1.10.0...v1.11.0) (2026-05-01)
 
 
