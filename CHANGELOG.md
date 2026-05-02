@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/rzkadltm/brolyu-web/compare/v1.15.0...v1.16.0) (2026-05-02)
+
+
+### Features
+
+* **auth:** wire passwordless auth and route guards ([0181d3a](https://github.com/rzkadltm/brolyu-web/commit/0181d3a06863d0b6b877c4812cdf240b1e0161fb))
+
 # [1.15.0](https://github.com/rzkadltm/brolyu-web/compare/v1.14.0...v1.15.0) (2026-05-02)
 
 
