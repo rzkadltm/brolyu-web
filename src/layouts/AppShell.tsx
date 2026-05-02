@@ -9,7 +9,6 @@ function AppShell() {
   const { user, signOut } = useAuth()
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const isMessages = pathname === '/messages'
   const isApp = pathname === '/app'
 
   const [menuOpen, setMenuOpen] = useState(false)
@@ -63,7 +62,7 @@ function AppShell() {
     <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
       <IconRail />
       <main className="flex flex-col flex-1 overflow-hidden relative pb-[60px] md:pb-0">
-        {!isMessages && (
+        {isApp && (
         <div className="ap-shell-cluster">
           <button
             type="button"

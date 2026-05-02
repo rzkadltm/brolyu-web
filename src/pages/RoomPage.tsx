@@ -186,7 +186,7 @@ export default function RoomPage() {
   const extraListeners = room.listeners - visibleListeners.length
 
   return (
-    <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+    <div className="relative" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
       <SEO
         title={room ? `${room.name} — Voice Room` : 'Voice Room'}
         description={
@@ -316,10 +316,22 @@ export default function RoomPage() {
       </div>
 
       {/* Right Chat */}
-      {chatOpen && <div className="rp-chat-panel hidden md:flex">
+      {chatOpen && <div className="rp-chat-panel absolute inset-0 z-30 w-full md:static md:inset-auto md:z-auto md:w-[300px]">
         <div className="rp-chat-header">
           <div className="rp-chat-header-title">Room Chat</div>
-          <div style={{ fontSize: 12, color: 'var(--text-d)' }}>Chat</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-d)' }}>Chat</div>
+            <button
+              type="button"
+              aria-label="Close chat"
+              onClick={() => setChatOpen(false)}
+              className="md:hidden inline-flex items-center justify-center w-7 h-7 rounded-md text-[color:var(--text-d)] hover:text-[color:var(--text)] hover:bg-[color:var(--color-border)]/40 transition-colors"
+            >
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M3 3l10 10M13 3L3 13" />
+              </svg>
+            </button>
+          </div>
         </div>
         <div className="rp-chat-messages">
           {msgs.map((m, i) => {
