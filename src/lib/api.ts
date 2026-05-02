@@ -75,6 +75,13 @@ export const api = {
       body: JSON.stringify({ email }),
     }),
   me: () => request<User>('/auth/me'),
+  updateProfile: (
+    body: Partial<Pick<User, 'name' | 'bio' | 'avatarInitial' | 'avatarColor'>>,
+  ) =>
+    request<User>('/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
 
   // Generic OAuth start. Add a provider on the server (one new file +
   // module entry) and you can call oauthStartUrl('github') here too.

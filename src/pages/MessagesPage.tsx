@@ -188,11 +188,36 @@ function MessagesPage() {
   const [msgs, setMsgs] = useState<Msg[]>(INITIAL_MSGS)
   const [input, setInput] = useState('')
   const [showTyping, setShowTyping] = useState(true)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [trackedConvoId, setTrackedConvoId] = useState(activeConvoId)
   const endRef = useRef<HTMLDivElement>(null)
+  const profileTriggerRef = useRef<HTMLButtonElement>(null)
+  const profileCloseRef = useRef<HTMLButtonElement>(null)
+
+  if (trackedConvoId !== activeConvoId) {
+    setTrackedConvoId(activeConvoId)
+    if (profileOpen) setProfileOpen(false)
+  }
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [msgs, showTyping])
+
+  useEffect(() => {
+    if (!profileOpen) return
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setProfileOpen(false)
+        profileTriggerRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [profileOpen])
+
+  useEffect(() => {
+    if (profileOpen) profileCloseRef.current?.focus()
+  }, [profileOpen])
 
   const activeConvo = CONVOS.find(c => c.id === activeConvoId) ?? CONVOS[0]
   const activeInitials = activeConvo.type === 'dm' ? activeConvo.initials : activeConvo.initials[0]
@@ -291,31 +316,40 @@ function MessagesPage() {
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold text-white relative"
-              style={{ background: activeColor }}
+            <button
+              ref={profileTriggerRef}
+              type="button"
+              className="mp-profile-trigger flex items-center gap-3 cursor-pointer"
+              aria-expanded={profileOpen}
+              aria-controls="messages-profile-panel"
+              onClick={() => setProfileOpen(o => !o)}
             >
-              {activeInitials}
-              {activeConvo.online && <div className="mp-chat-header-online" />}
-            </div>
-            <div>
-              <div className="font-display text-[16px] font-bold tracking-[-0.3px]" style={{ color: 'var(--text)' }}>
-                {activeConvo.name}
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold text-white relative"
+                style={{ background: activeColor }}
+              >
+                {activeInitials}
+                {activeConvo.online && <div className="mp-chat-header-online" />}
               </div>
-              <div className="text-[12px] flex items-center gap-[5px]" style={{ color: 'var(--text-m)' }}>
-                {activeConvo.online ? (
-                  <>
-                    <div className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--color-green)' }} />
-                    Active now
-                  </>
-                ) : (
-                  <span style={{ color: 'var(--text-d)' }}>Last seen recently</span>
-                )}
+              <div className="text-left">
+                <div className="font-display text-[16px] font-bold tracking-[-0.3px]" style={{ color: 'var(--text)' }}>
+                  {activeConvo.name}
+                </div>
+                <div className="text-[12px] flex items-center gap-[5px]" style={{ color: 'var(--text-m)' }}>
+                  {activeConvo.online ? (
+                    <>
+                      <div className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--color-green)' }} />
+                      Active now
+                    </>
+                  ) : (
+                    <span style={{ color: 'var(--text-d)' }}>Last seen recently</span>
+                  )}
+                </div>
               </div>
-            </div>
+            </button>
           </div>
           <div className="flex gap-[6px]">
-            <button className="mp-hdr-btn accent">📞</button>
+            <button className="mp-hdr-btn accent">🎙️</button>
             <button className="mp-hdr-btn accent">📹</button>
             <button className="mp-hdr-btn">🔍</button>
             <button className="mp-hdr-btn">⋯</button>
@@ -339,12 +373,24 @@ function MessagesPage() {
                 key={msg.id}
                 className={`mp-msg-row${msg.from === 'me' ? ' me' : ''}${isConsec ? ' consecutive' : ''}`}
               >
-                <div
-                  className={`mp-msg-av${isConsec ? ' hidden' : ''}`}
-                  style={{ background: msg.from === 'them' ? activeColor : 'var(--color-accent)' }}
-                >
-                  {msg.from === 'them' ? activeInitials : 'U'}
-                </div>
+                {msg.from === 'them' ? (
+                  <button
+                    type="button"
+                    className={`mp-msg-av${isConsec ? ' hidden' : ''}`}
+                    style={{ background: activeColor }}
+                    onClick={() => setProfileOpen(o => !o)}
+                    aria-label={`Open ${activeConvo.name} profile`}
+                  >
+                    {activeInitials}
+                  </button>
+                ) : (
+                  <div
+                    className={`mp-msg-av${isConsec ? ' hidden' : ''}`}
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    U
+                  </div>
+                )}
                 <div className={`flex flex-col gap-[3px] max-w-[68%]${msg.from === 'me' ? ' items-end' : ''}`}>
                   {!isConsec && msg.from !== 'me' && (
                     <div className="text-[11px] font-semibold px-1" style={{ color: 'var(--text-m)' }}>
@@ -420,71 +466,99 @@ function MessagesPage() {
       </div>
 
       {/* Profile Panel */}
-      <div className="mp-profile-panel hidden lg:flex">
-        <div className="px-5 pt-7 pb-5 text-center border-b" style={{ borderColor: 'var(--border2)' }}>
+      {profileOpen && (
+        <>
           <div
-            className="w-[72px] h-[72px] rounded-full flex items-center justify-center font-display text-[26px] font-bold text-white mx-auto mb-3 relative"
-            style={{ background: activeColor, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}
+            className="mp-profile-backdrop lg:hidden"
+            onClick={() => {
+              setProfileOpen(false)
+              profileTriggerRef.current?.focus()
+            }}
+          />
+          <div
+            id="messages-profile-panel"
+            className="mp-profile-panel mp-profile-panel-open"
+            role="dialog"
+            aria-label={`${activeConvo.name} profile`}
           >
-            {activeInitials}
-            {activeConvo.online && <div className="mp-profile-online-ring" />}
-          </div>
-          <div className="font-display text-[17px] font-bold tracking-[-0.3px] mb-1" style={{ color: 'var(--text)' }}>
-            {activeConvo.name}
-          </div>
-          <div className="text-[12px] mb-[10px]" style={{ color: 'var(--text-m)' }}>
-            @{activeConvo.name.toLowerCase().replace(/\s+/g, '_')} · Brolyu
-          </div>
-          <div className="mp-profile-status-badge">
-            <div className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--color-green)' }} />
-            {activeConvo.online ? 'Active now' : 'Offline'}
-          </div>
-          <div className="flex justify-center gap-[10px] mt-4">
-            {PROFILE_ACTIONS.map(([icon, label]) => (
-              <div key={label} className="flex flex-col items-center gap-[5px] cursor-pointer">
-                <div className="mp-profile-action-icon">{icon}</div>
-                <div className="text-[10px]" style={{ color: 'var(--text-d)' }}>{label}</div>
+            <button
+              ref={profileCloseRef}
+              type="button"
+              className="mp-profile-close lg:hidden"
+              aria-label="Close profile"
+              onClick={() => {
+                setProfileOpen(false)
+                profileTriggerRef.current?.focus()
+              }}
+            >
+              ×
+            </button>
+            <div className="px-5 pt-7 pb-5 text-center border-b" style={{ borderColor: 'var(--border2)' }}>
+              <div
+                className="w-[72px] h-[72px] rounded-full flex items-center justify-center font-display text-[26px] font-bold text-white mx-auto mb-3 relative"
+                style={{ background: activeColor, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}
+              >
+                {activeInitials}
+                {activeConvo.online && <div className="mp-profile-online-ring" />}
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border2)' }}>
-          <div className="text-[10px] tracking-[1.5px] uppercase font-semibold mb-3" style={{ color: 'var(--text-d)' }}>
-            About
-          </div>
-          {PROFILE_INFO.map(([icon, label, val]) => (
-            <div key={label} className="flex items-center gap-[10px] mb-2">
-              <span className="text-[14px] w-5 text-center" style={{ color: 'var(--text-d)' }}>{icon}</span>
-              <span className="text-[12px]" style={{ color: 'var(--text-m)' }}>
-                {label}: <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{val}</strong>
-              </span>
+              <div className="font-display text-[17px] font-bold tracking-[-0.3px] mb-1" style={{ color: 'var(--text)' }}>
+                {activeConvo.name}
+              </div>
+              <div className="text-[12px] mb-[10px]" style={{ color: 'var(--text-m)' }}>
+                @{activeConvo.name.toLowerCase().replace(/\s+/g, '_')} · Brolyu
+              </div>
+              <div className="mp-profile-status-badge">
+                <div className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--color-green)' }} />
+                {activeConvo.online ? 'Active now' : 'Offline'}
+              </div>
+              <div className="flex justify-center gap-[10px] mt-4">
+                {PROFILE_ACTIONS.map(([icon, label]) => (
+                  <div key={label} className="flex flex-col items-center gap-[5px] cursor-pointer">
+                    <div className="mp-profile-action-icon">{icon}</div>
+                    <div className="text-[10px]" style={{ color: 'var(--text-d)' }}>{label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
 
-        <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border2)' }}>
-          <div className="text-[10px] tracking-[1.5px] uppercase font-semibold mb-3" style={{ color: 'var(--text-d)' }}>
-            Languages
-          </div>
-          <div className="flex gap-[6px] flex-wrap">
-            <span className="mp-lang-badge native">🟢 Arabic (native)</span>
-            <span className="mp-lang-badge">EN · B2</span>
-            <span className="mp-lang-badge">FR · A1</span>
-          </div>
-        </div>
+            <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border2)' }}>
+              <div className="text-[10px] tracking-[1.5px] uppercase font-semibold mb-3" style={{ color: 'var(--text-d)' }}>
+                About
+              </div>
+              {PROFILE_INFO.map(([icon, label, val]) => (
+                <div key={label} className="flex items-center gap-[10px] mb-2">
+                  <span className="text-[14px] w-5 text-center" style={{ color: 'var(--text-d)' }}>{icon}</span>
+                  <span className="text-[12px]" style={{ color: 'var(--text-m)' }}>
+                    {label}: <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{val}</strong>
+                  </span>
+                </div>
+              ))}
+            </div>
 
-        <div className="px-5 py-4">
-          <div className="text-[10px] tracking-[1.5px] uppercase font-semibold mb-3" style={{ color: 'var(--text-d)' }}>
-            Shared Media
+            <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border2)' }}>
+              <div className="text-[10px] tracking-[1.5px] uppercase font-semibold mb-3" style={{ color: 'var(--text-d)' }}>
+                Languages
+              </div>
+              <div className="flex gap-[6px] flex-wrap">
+                <span className="mp-lang-badge native">🟢 Arabic (native)</span>
+                <span className="mp-lang-badge">EN · B2</span>
+                <span className="mp-lang-badge">FR · A1</span>
+              </div>
+            </div>
+
+            <div className="px-5 py-4">
+              <div className="text-[10px] tracking-[1.5px] uppercase font-semibold mb-3" style={{ color: 'var(--text-d)' }}>
+                Shared Media
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                {['🗓️', '📊', '🖼️', '📸', '🎵', '📄'].map((e, i) => (
+                  <div key={i} className="mp-media-thumb">{e}</div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-1">
-            {['🗓️', '📊', '🖼️', '📸', '🎵', '📄'].map((e, i) => (
-              <div key={i} className="mp-media-thumb">{e}</div>
-            ))}
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
     </div>
   )

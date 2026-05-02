@@ -6,6 +6,7 @@ import MessagesPage from './pages/MessagesPage'
 import RoomPage from './pages/RoomPage'
 import AuthCallback from './pages/AuthCallback'
 import AppShell from './layouts/AppShell'
+import ProfilePage from './features/profile/ProfilePage'
 
 function RoomPageKeyed() {
   const { id } = useParams()
@@ -22,6 +23,7 @@ function App() {
         <Route element={<AppShell />}>
           <Route path="/app" element={<AppPage />} />
           <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/room/:id" element={<RoomPageKeyed />} />
         </Route>
       </Routes>

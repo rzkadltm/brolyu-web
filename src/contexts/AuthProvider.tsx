@@ -65,9 +65,38 @@ export function AuthProvider({ children }: Props) {
     setUser(null)
   }, [])
 
+  const updateProfile = useCallback(
+    async (patch: Partial<Pick<User, 'name' | 'bio' | 'avatarInitial' | 'avatarColor'>>) => {
+      const updated = await api.updateProfile(patch)
+      setUser(updated)
+      return updated
+    },
+    [],
+  )
+
   const value = useMemo<AuthContextValue>(
-    () => ({ user, loading, signInWithEmail, registerWithEmail, signInWithOAuth, signInWithGoogle, applyToken, signOut }),
-    [user, loading, signInWithEmail, registerWithEmail, signInWithOAuth, signInWithGoogle, applyToken, signOut],
+    () => ({
+      user,
+      loading,
+      signInWithEmail,
+      registerWithEmail,
+      signInWithOAuth,
+      signInWithGoogle,
+      applyToken,
+      signOut,
+      updateProfile,
+    }),
+    [
+      user,
+      loading,
+      signInWithEmail,
+      registerWithEmail,
+      signInWithOAuth,
+      signInWithGoogle,
+      applyToken,
+      signOut,
+      updateProfile,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
