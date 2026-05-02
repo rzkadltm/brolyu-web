@@ -1,4 +1,71 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { SEO } from '../components/SEO'
+
+const HOME_JSON_LD = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Brolyu — Make Friends, Learn Languages & Game Together',
+    url: 'https://brolyu.com/',
+    description:
+      'Join Brolyu to connect with people worldwide through live voice rooms. Make friends, learn languages, study together, and play games — all in real-time.',
+    isPartOf: { '@type': 'WebSite', url: 'https://brolyu.com' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is Brolyu?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Brolyu is a platform that connects people worldwide through live voice rooms. You can make new friends, practice languages with native speakers, study together, and play voice games — all in real-time.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is Brolyu free to use?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, Brolyu is completely free. You can join and create voice rooms, connect with people globally, and access all core features at no cost.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How can I learn a language on Brolyu?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Brolyu connects you with native speakers through language exchange voice rooms. Practice real conversations, get real-time pronunciation feedback, and follow structured lessons while making friends who speak your target language.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can I make friends on Brolyu?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Absolutely. Brolyu matches you with people based on shared interests. Join interest-based voice rooms, participate in spontaneous hangouts, and build lasting friendships through real voice conversations.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What kind of games can I play on Brolyu?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Brolyu offers voice-first multiplayer mini-games including word games, trivia battles, and voice challenges. Compete in weekly tournaments with global leaderboards or create custom game rooms for your friends.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I study with others on Brolyu?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Join or create study rooms with shared whiteboards and AI tutor support available 24/7. Study any subject, track streaks with friends, and stay motivated with a global community of learners.',
+        },
+      },
+    ],
+  },
+]
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -638,6 +705,12 @@ function HomePage() {
 
   return (
     <div className="hp-root">
+      <SEO
+        title="Brolyu — Make Friends, Learn Languages &amp; Game Together"
+        description="Join Brolyu to connect with people worldwide through live voice rooms. Make new friends, practice languages with native speakers, study together, and play games — all in real-time."
+        path="/"
+        jsonLd={HOME_JSON_LD}
+      />
       {/* ── NAV ── */}
       <nav
         className="fixed top-0 left-0 right-0 z-[100] h-16 flex items-center border-b"
