@@ -238,6 +238,13 @@
   }
   .ap-theme-btn:hover { background: var(--surface2); }
 
+  .ap-shell-cluster {
+    position: absolute; top: 22px; right: 22px; z-index: 20;
+    display: flex; align-items: center; gap: 10px;
+  }
+  /* width of .ap-shell-cluster + 22px right offset; pages pad their topbars by this to avoid overlap */
+  .ap-topbar-clear { padding-right: 110px; }
+
   .ap-join-btn {
     font-family: var(--font-body); font-size: 12px; font-weight: 700;
     padding: 8px 22px; border-radius: 50px; border: none; cursor: pointer;

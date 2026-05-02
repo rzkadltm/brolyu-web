@@ -121,7 +121,6 @@ export default function RoomPage() {
 
   const room = ROOMS.find(r => r.id === Number(id))
 
-  const [theme, setTheme]               = useState<'dark' | 'light'>('dark')
   const [sidebarOpen, setSidebarOpen]   = useState(true)
   const [chatOpen, setChatOpen]         = useState(false)
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
@@ -173,17 +172,9 @@ export default function RoomPage() {
     return matchFilter && matchSearch
   })
 
-  const NAV_ITEMS = [
-    { icon: '🏠', active: false, route: '/app' },
-    { icon: '💬', active: false, badge: 3, route: '/messages' },
-    { icon: '🔍', active: false, route: null },
-    { icon: '📚', active: false, route: null },
-    { icon: '🎮', active: false, route: null },
-  ]
-
   if (!room) {
     return (
-      <div className="ap-root" data-theme={theme} style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, color: 'var(--text)' }}>Room not found</div>
         <Link to="/app" style={{ color: 'var(--color-accent)', fontSize: 14 }}>← Back to rooms</Link>
       </div>
@@ -195,7 +186,7 @@ export default function RoomPage() {
   const extraListeners = room.listeners - visibleListeners.length
 
   return (
-    <div className="ap-root" data-theme={theme} style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
       <SEO
         title={room ? `${room.name} — Voice Room` : 'Voice Room'}
         description={
@@ -205,25 +196,6 @@ export default function RoomPage() {
         }
         path={`/room/${id ?? ''}`}
       />
-      {/* Icon Rail */}
-      <div className="ap-rail">
-        <Link to="/app" style={{ textDecoration: 'none' }}>
-          <div className="ap-rail-logo">B</div>
-        </Link>
-        <div className="ap-rail-sep" />
-        {NAV_ITEMS.map((item, i) => (
-          <div key={i} className={`ap-rail-btn${item.active ? ' active' : ''}`} onClick={() => { if (item.route) navigate(item.route) }}>
-            {item.icon}
-            {item.badge !== undefined && <div className="ap-rail-badge">{item.badge}</div>}
-          </div>
-        ))}
-        <div className="mt-auto flex flex-col items-center gap-2">
-          <div className="ap-rail-btn" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}>
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </div>
-          <div className="ap-rail-avatar">U</div>
-        </div>
-      </div>
 
       {/* Sidebar */}
       <div className="relative flex-shrink-0" style={{ width: sidebarOpen ? 300 : 0 }}>

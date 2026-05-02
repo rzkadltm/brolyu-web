@@ -17,14 +17,6 @@ const TAG_CLASSES: Record<TagColor, string> = {
 const WAVE_DELAYS = [0, 0.15, 0.3, 0.15]
 const WAVE_HEIGHTS = [8, 12, 5, 12]
 
-const NAV_ITEMS: { icon: string; active: boolean; badge?: number; route?: string }[] = [
-  { icon: '🏠', active: true, route: '/app' },
-  { icon: '💬', active: false, badge: 3, route: '/messages' },
-  { icon: '🔍', active: false },
-  { icon: '📚', active: false },
-  { icon: '🎮', active: false },
-]
-
 function RoomCard({ room, index }: { room: Room; index: number }) {
   const navigate = useNavigate()
   const hasSpeaking = room.live && room.speakers.some(s => s.speaking)
@@ -145,12 +137,8 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
 }
 
 function AppPage() {
-  const navigate = useNavigate()
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
-
-  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'))
 
   const filtered = ROOMS.filter(room => {
     const matchFilter =
@@ -168,109 +156,79 @@ function AppPage() {
   const liveCount = filtered.filter(r => r.live).length
 
   return (
-    <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
+    <>
       <SEO
         title="Discover Rooms"
         description={`Browse ${liveCount} live voice rooms on Brolyu. Find study groups, language exchange partners, gaming rooms, and friend circles. Join thousands of people connecting right now.`}
         path="/app"
       />
-      {/* Icon Rail */}
-      <div className="ap-rail">
-        <div className="ap-rail-logo">B</div>
-        <div className="ap-rail-sep" />
-        {NAV_ITEMS.map((item, i) => (
-          <div
-            key={i}
-            className={`ap-rail-btn${item.active ? ' active' : ''}`}
-            onClick={() => { if (item.route) navigate(item.route) }}
+      {/* Topbar */}
+      <div className="shrink-0 pt-[22px] px-8 ap-topbar-clear">
+        <div className="flex items-center justify-between mb-5">
+          <h1
+            className="font-display text-[26px] font-bold tracking-[-0.8px]"
+            style={{ color: 'var(--text)' }}
           >
-            {item.icon}
-            {item.badge !== undefined && (
-              <div className="ap-rail-badge">{item.badge}</div>
-            )}
+            Discover <span className="text-accent">Rooms</span>
+          </h1>
+          <div className="flex items-center gap-[10px]">
+            <button className="ap-create-btn">＋ Create Room</button>
           </div>
-        ))}
-        <div className="mt-auto flex flex-col items-center gap-2">
-          <div className="ap-rail-btn" onClick={toggleTheme}>
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </div>
-          <div className="ap-rail-avatar">U</div>
         </div>
-      </div>
 
-      {/* Main */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Topbar */}
-        <div className="shrink-0 pt-[22px] px-8">
-          <div className="flex items-center justify-between mb-5">
-            <h1
-              className="font-display text-[26px] font-bold tracking-[-0.8px]"
-              style={{ color: 'var(--text)' }}
-            >
-              Discover <span className="text-accent">Rooms</span>
-            </h1>
-            <div className="flex items-center gap-[10px]">
-              <button className="ap-theme-btn" onClick={toggleTheme}>
-                {theme === 'dark' ? '☀️' : '🌙'}
+        {/* Search + Filters */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="ap-search-wrap">
+            <span className="text-[14px]" style={{ color: 'var(--text-d)' }}>🔍</span>
+            <input
+              className="ap-search-input"
+              placeholder="Search rooms, topics, people..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-[7px] flex-wrap">
+            {FILTERS.map(f => (
+              <button
+                key={f}
+                className={`ap-chip${filter === f ? ' active' : ''}`}
+                onClick={() => setFilter(f)}
+              >
+                {f}
               </button>
-              <button className="ap-create-btn">＋ Create Room</button>
-            </div>
-          </div>
-
-          {/* Search + Filters */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="ap-search-wrap">
-              <span className="text-[14px]" style={{ color: 'var(--text-d)' }}>🔍</span>
-              <input
-                className="ap-search-input"
-                placeholder="Search rooms, topics, people..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-[7px] flex-wrap">
-              {FILTERS.map(f => (
-                <button
-                  key={f}
-                  className={`ap-chip${filter === f ? ' active' : ''}`}
-                  onClick={() => setFilter(f)}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Rooms scroll */}
-        <div className="ap-rooms-scroll flex-1 overflow-y-auto px-8 pb-8">
-          <div className="ap-section-label">
-            {filter === 'All'
-              ? `${liveCount} live rooms`
-              : `${filtered.length} rooms · ${filter}`}
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {filtered.map((room, i) => (
-              <RoomCard key={room.id} room={room} index={i} />
             ))}
           </div>
-          {filtered.length === 0 && (
-            <div
-              className="text-center py-20 text-[14px]"
-              style={{ color: 'var(--text-d)' }}
-            >
-              No rooms found for &ldquo;{search || filter}&rdquo; —{' '}
-              <span
-                className="text-accent cursor-pointer"
-                onClick={() => { setSearch(''); setFilter('All') }}
-              >
-                clear filters
-              </span>
-            </div>
-          )}
         </div>
       </div>
-    </div>
+
+      {/* Rooms scroll */}
+      <div className="ap-rooms-scroll flex-1 overflow-y-auto px-8 pb-8">
+        <div className="ap-section-label">
+          {filter === 'All'
+            ? `${liveCount} live rooms`
+            : `${filtered.length} rooms · ${filter}`}
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {filtered.map((room, i) => (
+            <RoomCard key={room.id} room={room} index={i} />
+          ))}
+        </div>
+        {filtered.length === 0 && (
+          <div
+            className="text-center py-20 text-[14px]"
+            style={{ color: 'var(--text-d)' }}
+          >
+            No rooms found for &ldquo;{search || filter}&rdquo; —{' '}
+            <span
+              className="text-accent cursor-pointer"
+              onClick={() => { setSearch(''); setFilter('All') }}
+            >
+              clear filters
+            </span>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { SEO } from '../components/SEO'
 
 type DmConvo = {
@@ -92,14 +91,6 @@ const INITIAL_MSGS: Msg[] = [
 
 const VOICE_HEIGHTS = [6, 10, 14, 8, 18, 10, 6, 14, 9, 16, 7, 12, 18, 8, 10, 14, 6]
 
-const NAV_ITEMS: Array<{ icon: string; route: string | null; active?: true }> = [
-  { icon: '🏠', route: '/app' },
-  { icon: '💬', route: '/messages', active: true },
-  { icon: '🔍', route: null },
-  { icon: '📚', route: null },
-  { icon: '🎮', route: null },
-]
-
 const PROFILE_ACTIONS: [string, string][] = [
   ['🎙️', 'Voice'],
   ['📹', 'Video'],
@@ -191,8 +182,6 @@ function ConvoItem({ convo, active, onClick }: ConvoItemProps) {
 }
 
 function MessagesPage() {
-  const navigate = useNavigate()
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [activeConvoId, setActiveConvoId] = useState(1)
   const [tab, setTab] = useState<'All' | 'Direct' | 'Groups'>('All')
   const [msgs, setMsgs] = useState<Msg[]>(INITIAL_MSGS)
@@ -238,32 +227,12 @@ function MessagesPage() {
   }
 
   return (
-    <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
+    <div className="flex flex-1 overflow-hidden">
       <SEO
         title="Messages"
         description="Chat and connect with your Brolyu friends and language exchange partners. Send messages, share voice clips, and keep conversations going."
         path="/messages"
       />
-      {/* Icon Rail */}
-      <div className="ap-rail">
-        <div className="ap-rail-logo">B</div>
-        <div className="ap-rail-sep" />
-        {NAV_ITEMS.map((item, i) => (
-          <div
-            key={i}
-            className={`ap-rail-btn${item.active ? ' active' : ''}`}
-            onClick={() => { if (item.route) navigate(item.route) }}
-          >
-            {item.icon}
-          </div>
-        ))}
-        <div className="mt-auto flex flex-col items-center gap-2">
-          <div className="ap-rail-btn" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}>
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </div>
-          <div className="ap-rail-avatar">U</div>
-        </div>
-      </div>
 
       {/* Conversation Panel */}
       <div className="mp-convo-panel">
