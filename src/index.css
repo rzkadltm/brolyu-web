@@ -524,6 +524,12 @@
   }
   .rp-ctrl-mic:hover { transform: scale(1.08); box-shadow: 0 6px 28px oklch(62% 0.22 265 / 0.3); }
   .rp-ctrl-mic.muted { background: var(--bg3); box-shadow: none; }
+  .rp-ctrl-mic.muted::after {
+    content: ''; position: absolute; width: 2px; height: 70%;
+    background: oklch(62% 0.22 15); border-radius: 1px;
+    transform: rotate(45deg); pointer-events: none;
+  }
+  .rp-ctrl-mic { position: relative; }
 
   .rp-chat-panel {
     width: 300px; flex-shrink: 0; background: var(--bg2);
