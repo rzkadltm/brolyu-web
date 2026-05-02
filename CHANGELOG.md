@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/rzkadltm/brolyu-web/compare/v1.13.1...v1.14.0) (2026-05-02)
+
+
+### Features
+
+* **seo:** add meta tags, structured data, and crawlability files ([#9](https://github.com/rzkadltm/brolyu-web/issues/9)) ([2335b2f](https://github.com/rzkadltm/brolyu-web/commit/2335b2f72e5697c4bba37ca79d62fa9393a3537a)), closes [#8](https://github.com/rzkadltm/brolyu-web/issues/8)
+
 ## [1.13.1](https://github.com/rzkadltm/brolyu-web/compare/v1.13.0...v1.13.1) (2026-05-01)
 
 
