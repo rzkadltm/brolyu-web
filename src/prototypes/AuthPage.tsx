@@ -1,43 +1,25 @@
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { SEO } from '../components/SEO'
+import { useAuth } from '../contexts/useAuth'
+import { ApiError } from '../lib/api'
 
 type Theme = 'dark' | 'light'
+
+const POST_LOGIN_KEY = 'brolyu_post_login'
 
 interface AuthErrors {
   name?: string
   email?: string
-  password?: string
+  form?: string
 }
 
-function pwStrength(pw: string): number {
-  if (!pw) return 0
-  let s = 0
-  if (pw.length >= 8) s++
-  if (/[A-Z]/.test(pw)) s++
-  if (/[0-9]/.test(pw)) s++
-  if (/[^A-Za-z0-9]/.test(pw)) s++
-  return s
-}
-
-function getStrengthLabel(s: number): string {
-  switch (s) {
-    case 1: return 'Weak'
-    case 2: return 'Fair'
-    case 3: return 'Good'
-    case 4: return 'Strong'
-    default: return ''
+function readFromState(state: unknown): string | null {
+  if (state && typeof state === 'object' && 'from' in state) {
+    const v = (state as { from?: unknown }).from
+    if (typeof v === 'string' && v.startsWith('/')) return v
   }
-}
-
-function getStrengthColor(s: number): string {
-  switch (s) {
-    case 1: return 'var(--error)'
-    case 2: return 'oklch(75% 0.18 70)'
-    case 3: return 'oklch(70% 0.18 195)'
-    case 4: return 'var(--green)'
-    default: return ''
-  }
+  return null
 }
 
 function GoogleIcon() {
@@ -53,12 +35,12 @@ function GoogleIcon() {
 
 interface SignInFormProps {
   onSwitch: () => void
+  redirectTo: string
 }
 
-function SignInForm({ onSwitch }: SignInFormProps) {
+function SignInForm({ onSwitch, redirectTo }: SignInFormProps) {
+  const { signInWithEmail, signInWithGoogle } = useAuth()
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<AuthErrors>({})
   const [success, setSuccess] = useState(false)
@@ -69,12 +51,10 @@ function SignInForm({ onSwitch }: SignInFormProps) {
     const e: AuthErrors = {}
     if (!email) e.email = 'Email is required'
     else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Enter a valid email address'
-    if (!password) e.password = 'Password is required'
-    else if (password.length < 6) e.password = 'Password must be at least 6 characters'
     return e
   }
 
-  function handleSubmit(ev: React.FormEvent) {
+  async function handleSubmit(ev: React.FormEvent) {
     ev.preventDefault()
     const e = validate()
     setErrors(e)
@@ -84,12 +64,29 @@ function SignInForm({ onSwitch }: SignInFormProps) {
       return
     }
     setLoading(true)
-    setTimeout(() => { setLoading(false); setSuccess(true) }, 1800)
+    try {
+      await signInWithEmail(email)
+      setSuccess(true)
+      navigate(redirectTo, { replace: true })
+    } catch (err) {
+      const msg =
+        err instanceof ApiError && err.status === 404
+          ? 'No account found for this email — try signing up.'
+          : err instanceof Error
+            ? err.message
+            : 'Sign-in failed'
+      setErrors({ form: msg })
+      formRef.current?.classList.add('auth-shake')
+      setTimeout(() => formRef.current?.classList.remove('auth-shake'), 400)
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleGoogleSignIn() {
     setLoading(true)
-    setTimeout(() => { setLoading(false); setSuccess(true) }, 1600)
+    localStorage.setItem(POST_LOGIN_KEY, redirectTo)
+    signInWithGoogle()
   }
 
   if (success) {
@@ -98,8 +95,8 @@ function SignInForm({ onSwitch }: SignInFormProps) {
         <div className="auth-success-icon">✓</div>
         <div className="auth-success-title">Welcome back!</div>
         <div className="auth-success-sub">Signing you into Brolyu…<br />Redirecting to your rooms.</div>
-        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => { localStorage.setItem('auth_token', 'demo'); navigate('/app') }}>
-          Go to Rooms →
+        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => navigate(redirectTo, { replace: true })}>
+          Continue →
         </button>
       </div>
     )
@@ -109,7 +106,7 @@ function SignInForm({ onSwitch }: SignInFormProps) {
     <div className="auth-card auth-fade-in" ref={formRef}>
       <div className="auth-card-header">
         <div className="auth-card-title">Welcome back</div>
-        <div className="auth-card-sub">Sign in to continue your conversations</div>
+        <div className="auth-card-sub">Sign in with your email — no password needed</div>
       </div>
 
       <div className="auth-tabs">
@@ -139,42 +136,14 @@ function SignInForm({ onSwitch }: SignInFormProps) {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={e => { setEmail(e.target.value); setErrors(er => ({ ...er, email: '' })) }}
+              onChange={e => { setEmail(e.target.value); setErrors(er => ({ ...er, email: '', form: '' })) }}
               autoComplete="email"
             />
           </div>
           {errors.email && <div className="auth-field-error" role="alert">⚠ {errors.email}</div>}
         </div>
 
-        <div className="auth-field">
-          <label className="auth-field-label" htmlFor="signin-password">Password</label>
-          <div className="auth-field-wrap">
-            <span className="auth-field-icon" aria-hidden="true">🔒</span>
-            <input
-              id="signin-password"
-              className={`auth-field-input${errors.password ? ' auth-field-input-error' : ''}`}
-              type={showPw ? 'text' : 'password'}
-              placeholder="Enter your password"
-              value={password}
-              onChange={e => { setPassword(e.target.value); setErrors(er => ({ ...er, password: '' })) }}
-              autoComplete="current-password"
-              style={{ paddingRight: 44 }}
-            />
-            <button
-              type="button"
-              className="auth-pw-toggle"
-              onClick={() => setShowPw(s => !s)}
-              aria-label={showPw ? 'Hide password' : 'Show password'}
-            >
-              {showPw ? '🙈' : '👁️'}
-            </button>
-          </div>
-          {errors.password && <div className="auth-field-error" role="alert">⚠ {errors.password}</div>}
-        </div>
-
-        <div className="auth-forgot-row">
-          <button type="button" className="auth-forgot-link">Forgot password?</button>
-        </div>
+        {errors.form && <div className="auth-field-error" role="alert">⚠ {errors.form}</div>}
 
         <button className="auth-submit-btn" type="submit" disabled={loading}>
           {loading ? <><div className="auth-spinner" /><span>Signing in...</span></> : 'Sign In →'}
@@ -191,13 +160,13 @@ function SignInForm({ onSwitch }: SignInFormProps) {
 
 interface SignUpFormProps {
   onSwitch: () => void
+  redirectTo: string
 }
 
-function SignUpForm({ onSwitch }: SignUpFormProps) {
+function SignUpForm({ onSwitch, redirectTo }: SignUpFormProps) {
+  const { registerWithEmail, signInWithGoogle } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<AuthErrors>({})
   const [success, setSuccess] = useState(false)
@@ -210,16 +179,10 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
     else if (name.trim().length < 2) e.name = 'Name must be at least 2 characters'
     if (!email) e.email = 'Email is required'
     else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Enter a valid email address'
-    if (!password) e.password = 'Password is required'
-    else if (password.length < 8) e.password = 'Use at least 8 characters'
     return e
   }
 
-  const strength = pwStrength(password)
-  const strengthLabel = getStrengthLabel(strength)
-  const strengthColor = getStrengthColor(strength)
-
-  function handleSubmit(ev: React.FormEvent) {
+  async function handleSubmit(ev: React.FormEvent) {
     ev.preventDefault()
     const e = validate()
     setErrors(e)
@@ -229,12 +192,29 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
       return
     }
     setLoading(true)
-    setTimeout(() => { setLoading(false); setSuccess(true) }, 2000)
+    try {
+      await registerWithEmail(email, name.trim())
+      setSuccess(true)
+      navigate(redirectTo, { replace: true })
+    } catch (err) {
+      const msg =
+        err instanceof ApiError && err.status === 409
+          ? 'An account with this email already exists — try signing in instead.'
+          : err instanceof Error
+            ? err.message
+            : 'Sign-up failed'
+      setErrors({ form: msg })
+      formRef.current?.classList.add('auth-shake')
+      setTimeout(() => formRef.current?.classList.remove('auth-shake'), 400)
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleGoogleSignUp() {
     setLoading(true)
-    setTimeout(() => { setLoading(false); setSuccess(true) }, 1600)
+    localStorage.setItem(POST_LOGIN_KEY, redirectTo)
+    signInWithGoogle()
   }
 
   const firstName = name.split(' ')[0]
@@ -245,8 +225,8 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
         <div className="auth-success-icon">🎉</div>
         <div className="auth-success-title">You're in{firstName ? `, ${firstName}` : ''}!</div>
         <div className="auth-success-sub">Your Brolyu account is ready.<br />Let's find you some rooms to join.</div>
-        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => { localStorage.setItem('auth_token', 'demo'); navigate('/app') }}>
-          Explore Rooms →
+        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => navigate(redirectTo, { replace: true })}>
+          Continue →
         </button>
       </div>
     )
@@ -256,7 +236,7 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
     <div className="auth-card auth-fade-in" ref={formRef}>
       <div className="auth-card-header">
         <div className="auth-card-title">Create your account</div>
-        <div className="auth-card-sub">Free forever · Open source · No ads</div>
+        <div className="auth-card-sub">Free forever · Open source · No password needed</div>
       </div>
 
       <div className="auth-tabs">
@@ -286,7 +266,7 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
               type="text"
               placeholder="Your name"
               value={name}
-              onChange={e => { setName(e.target.value); setErrors(er => ({ ...er, name: '' })) }}
+              onChange={e => { setName(e.target.value); setErrors(er => ({ ...er, name: '', form: '' })) }}
               autoComplete="name"
             />
           </div>
@@ -303,59 +283,14 @@ function SignUpForm({ onSwitch }: SignUpFormProps) {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={e => { setEmail(e.target.value); setErrors(er => ({ ...er, email: '' })) }}
+              onChange={e => { setEmail(e.target.value); setErrors(er => ({ ...er, email: '', form: '' })) }}
               autoComplete="email"
             />
           </div>
           {errors.email && <div className="auth-field-error" role="alert">⚠ {errors.email}</div>}
         </div>
 
-        <div className="auth-field">
-          <label className="auth-field-label" htmlFor="signup-password">Password</label>
-          <div className="auth-field-wrap">
-            <span className="auth-field-icon" aria-hidden="true">🔒</span>
-            <input
-              id="signup-password"
-              className={`auth-field-input${errors.password ? ' auth-field-input-error' : ''}`}
-              type={showPw ? 'text' : 'password'}
-              placeholder="Min. 8 characters"
-              value={password}
-              onChange={e => { setPassword(e.target.value); setErrors(er => ({ ...er, password: '' })) }}
-              autoComplete="new-password"
-              style={{ paddingRight: 44 }}
-            />
-            <button
-              type="button"
-              className="auth-pw-toggle"
-              onClick={() => setShowPw(s => !s)}
-              aria-label={showPw ? 'Hide password' : 'Show password'}
-            >
-              {showPw ? '🙈' : '👁️'}
-            </button>
-          </div>
-          {errors.password && <div className="auth-field-error" role="alert">⚠ {errors.password}</div>}
-          {password && !errors.password && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-              <div style={{ display: 'flex', gap: 3, flex: 1 }}>
-                {[1, 2, 3, 4].map(i => (
-                  <div
-                    key={i}
-                    style={{
-                      flex: 1,
-                      height: 3,
-                      borderRadius: 4,
-                      background: i <= strength ? strengthColor : 'var(--border)',
-                      transition: 'background 0.3s',
-                    }}
-                  />
-                ))}
-              </div>
-              <span style={{ fontSize: 11, color: strengthColor, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                {strengthLabel}
-              </span>
-            </div>
-          )}
-        </div>
+        {errors.form && <div className="auth-field-error" role="alert">⚠ {errors.form}</div>}
 
         <button className="auth-submit-btn" type="submit" disabled={loading}>
           {loading ? <><div className="auth-spinner" /><span>Creating account...</span></> : 'Create Account →'}
@@ -385,6 +320,26 @@ const SP_INITIALS = ['H', 'Y', 'P', 'Z', 'K'] as const
 export default function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [theme, setTheme] = useState<Theme>('dark')
+  const { user, loading } = useAuth()
+  const location = useLocation()
+  const redirectTo = readFromState(location.state) ?? '/app'
+
+  useEffect(() => {
+    if (user) {
+      // strip a stale post-login stash so a later Google redirect picks up the right target
+      localStorage.removeItem(POST_LOGIN_KEY)
+    }
+  }, [user])
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', fontFamily: 'system-ui', opacity: 0.6 }}>
+        Loading…
+      </div>
+    )
+  }
+
+  if (user) return <Navigate to={redirectTo} replace />
 
   return (
     <div className="auth-root" data-theme={theme}>
@@ -455,8 +410,8 @@ export default function AuthPage() {
 
         <div className="auth-right">
           {mode === 'signin'
-            ? <SignInForm onSwitch={() => setMode('signup')} />
-            : <SignUpForm onSwitch={() => setMode('signin')} />
+            ? <SignInForm onSwitch={() => setMode('signup')} redirectTo={redirectTo} />
+            : <SignUpForm onSwitch={() => setMode('signin')} redirectTo={redirectTo} />
           }
         </div>
       </div>
