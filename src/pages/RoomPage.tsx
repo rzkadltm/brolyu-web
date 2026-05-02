@@ -198,7 +198,7 @@ export default function RoomPage() {
       />
 
       {/* Sidebar */}
-      <div className="relative flex-shrink-0" style={{ width: sidebarOpen ? 300 : 0 }}>
+      <div className="relative flex-shrink-0 hidden md:block" style={{ width: sidebarOpen ? 300 : 0 }}>
         {sidebarOpen && (
           <div className="rp-sidebar">
             <div className="rp-sidebar-header">
@@ -316,7 +316,7 @@ export default function RoomPage() {
       </div>
 
       {/* Right Chat */}
-      {chatOpen && <div className="rp-chat-panel">
+      {chatOpen && <div className="rp-chat-panel hidden md:flex">
         <div className="rp-chat-header">
           <div className="rp-chat-header-title">Room Chat</div>
           <div style={{ fontSize: 12, color: 'var(--text-d)' }}>Chat</div>

@@ -183,6 +183,7 @@ function ConvoItem({ convo, active, onClick }: ConvoItemProps) {
 
 function MessagesPage() {
   const [activeConvoId, setActiveConvoId] = useState(1)
+  const [mobileThreadOpen, setMobileThreadOpen] = useState(false)
   const [tab, setTab] = useState<'All' | 'Direct' | 'Groups'>('All')
   const [msgs, setMsgs] = useState<Msg[]>(INITIAL_MSGS)
   const [input, setInput] = useState('')
@@ -235,7 +236,7 @@ function MessagesPage() {
       />
 
       {/* Conversation Panel */}
-      <div className="mp-convo-panel">
+      <div className={`mp-convo-panel ${mobileThreadOpen ? 'hidden' : 'flex'} md:flex`}>
         <div className="px-4 pt-5 pb-3 flex-shrink-0">
           <div className="font-display text-[18px] font-bold tracking-[-0.4px] mb-3" style={{ color: 'var(--text)' }}>
             Messages
@@ -258,21 +259,38 @@ function MessagesPage() {
               key={c.id}
               convo={c}
               active={activeConvoId === c.id}
-              onClick={() => setActiveConvoId(c.id)}
+              onClick={() => {
+                setActiveConvoId(c.id)
+                setMobileThreadOpen(true)
+              }}
             />
           ))}
         </div>
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'var(--bg)' }}>
+      <div
+        className={`flex-1 ${mobileThreadOpen ? 'flex' : 'hidden'} md:flex flex-col overflow-hidden`}
+        style={{ background: 'var(--bg)' }}
+      >
 
         {/* Chat Header */}
         <div
-          className="px-6 py-[14px] flex items-center justify-between flex-shrink-0 border-b"
+          className="px-4 md:px-6 py-[14px] flex items-center justify-between flex-shrink-0 border-b gap-3"
           style={{ borderColor: 'var(--border2)', backdropFilter: 'blur(12px)' }}
         >
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="md:hidden -ml-1 mr-1 w-9 h-9 flex items-center justify-center rounded-full"
+              style={{ color: 'var(--text)' }}
+              aria-label="Back to conversations"
+              onClick={() => setMobileThreadOpen(false)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold text-white relative"
               style={{ background: activeColor }}
@@ -297,7 +315,7 @@ function MessagesPage() {
             </div>
           </div>
           <div className="flex gap-[6px]">
-            <button className="mp-hdr-btn accent">🎙️</button>
+            <button className="mp-hdr-btn accent">📞</button>
             <button className="mp-hdr-btn accent">📹</button>
             <button className="mp-hdr-btn">🔍</button>
             <button className="mp-hdr-btn">⋯</button>
@@ -402,7 +420,7 @@ function MessagesPage() {
       </div>
 
       {/* Profile Panel */}
-      <div className="mp-profile-panel">
+      <div className="mp-profile-panel hidden lg:flex">
         <div className="px-5 pt-7 pb-5 text-center border-b" style={{ borderColor: 'var(--border2)' }}>
           <div
             className="w-[72px] h-[72px] rounded-full flex items-center justify-center font-display text-[26px] font-bold text-white mx-auto mb-3 relative"

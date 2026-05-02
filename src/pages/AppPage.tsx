@@ -163,10 +163,10 @@ function AppPage() {
         path="/app"
       />
       {/* Topbar */}
-      <div className="shrink-0 pt-[22px] px-8 ap-topbar-clear">
-        <div className="flex items-center justify-between mb-5">
+      <div className="shrink-0 pt-[18px] md:pt-[22px] pl-4 md:pl-8 pr-[64px] md:pr-[110px]">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4 md:mb-5">
           <h1
-            className="font-display text-[26px] font-bold tracking-[-0.8px]"
+            className="font-display text-[22px] md:text-[26px] font-bold tracking-[-0.8px]"
             style={{ color: 'var(--text)' }}
           >
             Discover <span className="text-accent">Rooms</span>
@@ -177,8 +177,8 @@ function AppPage() {
         </div>
 
         {/* Search + Filters */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="ap-search-wrap">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-5 md:mb-6">
+          <div className="ap-search-wrap w-full md:w-auto">
             <span className="text-[14px]" style={{ color: 'var(--text-d)' }}>🔍</span>
             <input
               className="ap-search-input"
@@ -202,13 +202,13 @@ function AppPage() {
       </div>
 
       {/* Rooms scroll */}
-      <div className="ap-rooms-scroll flex-1 overflow-y-auto px-8 pb-8">
+      <div className="ap-rooms-scroll flex-1 overflow-y-auto px-4 md:px-8 pb-8">
         <div className="ap-section-label">
           {filter === 'All'
             ? `${liveCount} live rooms`
             : `${filtered.length} rooms · ${filter}`}
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((room, i) => (
             <RoomCard key={room.id} room={room} index={i} />
           ))}
