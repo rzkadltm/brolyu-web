@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/rzkadltm/brolyu-web/compare/v1.16.0...v1.17.0) (2026-05-02)
+
+
+### Features
+
+* **mobile:** responsive UI pass + page relocation ([#11](https://github.com/rzkadltm/brolyu-web/issues/11)) ([bf05235](https://github.com/rzkadltm/brolyu-web/commit/bf052354ac9f7922ce2a734bc207aea4db593fa7))
+
 # [1.16.0](https://github.com/rzkadltm/brolyu-web/compare/v1.15.0...v1.16.0) (2026-05-02)
 
 
