@@ -1,3 +1,16 @@
+# [1.18.0](https://github.com/rzkadltm/brolyu-web/compare/v1.17.0...v1.18.0) (2026-05-02)
+
+
+### Bug Fixes
+
+* **ui:** repair mobile room chat overlay ([4bd1b12](https://github.com/rzkadltm/brolyu-web/commit/4bd1b1292cce1047cd6e38468c237575a00a3a6c))
+* **ui:** scroll mobile chat to newest message on open ([2b9b48c](https://github.com/rzkadltm/brolyu-web/commit/2b9b48c17fd7526cbbd486a6e0903100bd90bedf))
+
+
+### Features
+
+* **ui:** add profile page and toggleable messages connection panel ([7a4bf02](https://github.com/rzkadltm/brolyu-web/commit/7a4bf025e6b78a8d7513e2f63da9a90126e98e91))
+
 # [1.17.0](https://github.com/rzkadltm/brolyu-web/compare/v1.16.0...v1.17.0) (2026-05-02)
 
 

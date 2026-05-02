@@ -1,6 +1,6 @@
 {
   "name": "@brolyu/web-frontend",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Web frontend for Brolyu — connect, learn, and play together through voice, video, and screen sharing.",
   "license": "MIT",
   "type": "module",
