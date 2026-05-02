@@ -570,13 +570,13 @@ function UseCasePanel({ uc }: { uc: UseCase }) {
     uc.id === 'games' ? 'Live Games' : 'Discover People'
 
   return (
-    <div className="grid gap-[60px] items-center" style={{ gridTemplateColumns: '1fr 1fr' }}>
+    <div className="grid gap-10 md:gap-[60px] items-center grid-cols-1 md:grid-cols-2">
       <div>
         <h3
           className="font-bold leading-[1.15] mb-[18px] whitespace-pre-line"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(26px, 3vw, 34px)',
+            fontSize: 'clamp(24px, 5vw, 34px)',
             letterSpacing: '-1px',
             color: 'var(--text)',
           }}
@@ -600,8 +600,8 @@ function UseCasePanel({ uc }: { uc: UseCase }) {
       </div>
 
       <div
-        className="rounded-[24px] border flex flex-col p-6 gap-3 overflow-hidden"
-        style={{ height: 360, background: 'var(--bg2)', borderColor: 'var(--border)' }}
+        className="rounded-[24px] border flex flex-col p-5 md:p-6 gap-3 overflow-hidden h-auto md:h-[360px]"
+        style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}
       >
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[1.5px]" style={{ color: 'var(--text-dim)' }}>
           <span>{headerLabel}</span>
@@ -721,7 +721,7 @@ function HomePage() {
           borderColor: 'var(--border)',
         }}
       >
-        <div className="w-full max-w-[1280px] mx-auto px-8 flex items-center justify-between">
+        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 flex items-center justify-between">
           <a
             href="/"
             className="flex items-center gap-2 text-[21px] font-bold no-underline"
@@ -775,8 +775,7 @@ function HomePage() {
 
       {/* ── HERO ── */}
       <section
-        className="relative flex items-center overflow-hidden"
-        style={{ minHeight: '100vh', padding: '100px 32px 60px' }}
+        className="relative flex items-center overflow-hidden min-h-screen pt-24 pb-12 px-5 sm:px-8 md:pt-[100px] md:pb-[60px]"
       >
         {/* Glow orbs */}
         <div
@@ -801,8 +800,7 @@ function HomePage() {
         />
 
         <div
-          className="max-w-[1280px] mx-auto w-full grid gap-16 items-center"
-          style={{ gridTemplateColumns: '420px 1fr' }}
+          className="max-w-[1280px] mx-auto w-full grid gap-10 lg:gap-16 items-center grid-cols-1 lg:grid-cols-[420px_1fr]"
         >
           {/* Left: headline + CTAs */}
           <div
@@ -833,12 +831,13 @@ function HomePage() {
             </div>
 
             <h1
+              className="break-words"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(38px, 4.5vw, 60px)',
+                fontSize: 'clamp(36px, 9vw, 60px)',
                 fontWeight: 700,
                 lineHeight: 1.09,
-                letterSpacing: '-2px',
+                letterSpacing: '-1.5px',
                 color: 'var(--text)',
                 marginBottom: 22,
               }}
@@ -878,19 +877,6 @@ function HomePage() {
                 }}
               >
                 Start Talking
-              </a>
-              <a
-                href="#use-cases"
-                className="inline-flex items-center gap-1.5 rounded-full font-medium no-underline border transition-all duration-200"
-                style={{
-                  fontSize: 15,
-                  padding: '13px 28px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)',
-                  borderColor: 'var(--border)',
-                }}
-              >
-                See how it works
               </a>
             </div>
 
@@ -963,8 +949,8 @@ function HomePage() {
           borderColor: 'var(--border)',
         }}
       >
-        <div className="max-w-[1280px] mx-auto px-8 flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div
               className="flex items-center gap-2 rounded-full font-bold text-[13px] px-4 py-1.5 tracking-[-0.2px]"
               style={{
@@ -975,12 +961,12 @@ function HomePage() {
             >
               ✦ Open Source
             </div>
-            <p className="text-[14px]" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[13px] md:text-[14px]" style={{ color: 'var(--text-muted)' }}>
               <strong style={{ color: 'var(--text)', fontWeight: 600 }}>Brolyu is fully transparent.</strong>{' '}
               Inspect, contribute, and trust the code.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             {['⭐ Star on GitHub', '🔒 E2E Encrypted', '🚫 No Ads'].map((item) => (
               <div
                 key={item}
@@ -1003,7 +989,7 @@ function HomePage() {
         className="border-b py-11"
         style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}
       >
-        <div className="max-w-[1280px] mx-auto px-8 flex justify-center gap-20 flex-wrap">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8 flex justify-center gap-x-10 gap-y-6 md:gap-20 flex-wrap">
           {[
             { num: '2M+', label: 'Active Learners' },
             { num: '40+', label: 'Languages Supported' },
@@ -1032,8 +1018,8 @@ function HomePage() {
       </div>
 
       {/* ── FEATURES ── */}
-      <section id="features" style={{ padding: '120px 0' }}>
-        <div className="max-w-[1280px] mx-auto px-8">
+      <section id="features" className="py-16 md:py-[120px]">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
           <div
             ref={addRevealRef}
             style={{
@@ -1050,9 +1036,9 @@ function HomePage() {
             <h2
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(30px, 3.8vw, 50px)',
+                fontSize: 'clamp(28px, 6vw, 50px)',
                 fontWeight: 700,
-                letterSpacing: '-1.5px',
+                letterSpacing: '-1.2px',
                 color: 'var(--text)',
                 lineHeight: 1.1,
                 marginBottom: 16,
@@ -1060,12 +1046,12 @@ function HomePage() {
             >
               Everything you need<br />to grow through talk.
             </h2>
-            <p className="text-[17px] font-light leading-[1.65] mb-[60px] max-w-[480px]" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[15px] md:text-[17px] font-light leading-[1.65] mb-10 md:mb-[60px] max-w-[480px]" style={{ color: 'var(--text-muted)' }}>
               One platform for study, language, games, and friendships — powered by voice and AI.
             </p>
           </div>
 
-          <div className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="grid gap-[18px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feat, i) => (
               <div
                 key={feat.title}
@@ -1109,8 +1095,8 @@ function HomePage() {
       </section>
 
       {/* ── USE CASES ── */}
-      <section id="use-cases" style={{ padding: '0 0 120px' }}>
-        <div className="max-w-[1280px] mx-auto px-8">
+      <section id="use-cases" className="pb-16 md:pb-[120px]">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
           <div
             ref={addRevealRef}
             className="opacity-0 translate-y-7 [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0"
@@ -1125,11 +1111,12 @@ function HomePage() {
               Use Cases
             </div>
             <h2
+              className="break-words"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(30px, 3.8vw, 50px)',
+                fontSize: 'clamp(26px, 6vw, 50px)',
                 fontWeight: 700,
-                letterSpacing: '-1.5px',
+                letterSpacing: '-1.2px',
                 color: 'var(--text)',
                 lineHeight: 1.1,
                 marginBottom: 16,
@@ -1137,24 +1124,23 @@ function HomePage() {
             >
               One app, endless possibilities.
             </h2>
-            <p className="text-[17px] font-light leading-[1.65] mb-[48px] max-w-[480px]" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[15px] md:text-[17px] font-light leading-[1.65] mb-8 md:mb-[48px] max-w-[480px]" style={{ color: 'var(--text-muted)' }}>
               Pick your mode, or let Brolyu guide you to what fits best.
             </p>
           </div>
 
           {/* Tabs */}
           <div
-            className="flex gap-[3px] rounded-full border w-fit mb-12 p-1"
+            className="flex gap-[3px] rounded-full border w-fit max-w-full overflow-x-auto mb-8 md:mb-12 p-1"
             style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}
           >
             {USE_CASES.map((u) => (
               <button
                 key={u.id}
                 onClick={() => setActiveTab(u.id)}
-                className="rounded-full border-none cursor-pointer text-[14px] font-medium transition-all duration-[220ms]"
+                className="rounded-full border-none cursor-pointer text-[13px] md:text-[14px] font-medium transition-all duration-[220ms] whitespace-nowrap shrink-0 px-4 md:px-[22px] py-2"
                 style={{
                   fontFamily: 'var(--font-body)',
-                  padding: '8px 22px',
                   background: activeTab === u.id ? 'var(--color-accent)' : 'transparent',
                   color: activeTab === u.id ? 'white' : 'var(--text-muted)',
                   boxShadow: activeTab === u.id ? '0 4px 14px var(--color-accent-glow)' : 'none',
@@ -1170,13 +1156,12 @@ function HomePage() {
       </section>
 
       {/* ── CTA ── */}
-      <section id="community" style={{ padding: '60px 0 130px' }}>
-        <div className="max-w-[1280px] mx-auto px-8">
+      <section id="community" className="pt-10 pb-20 md:pt-[60px] md:pb-[130px]">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
           <div
             ref={addRevealRef}
-            className="relative overflow-hidden rounded-[28px] border text-center opacity-0 translate-y-7 [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0"
+            className="relative overflow-hidden rounded-[28px] border text-center opacity-0 translate-y-7 [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0 px-6 py-12 md:p-[80px]"
             style={{
-              padding: '80px',
               background: 'linear-gradient(135deg, oklch(18% 0.08 265) 0%, oklch(14% 0.06 300) 100%)',
               borderColor: 'oklch(62% 0.22 265 / 0.22)',
               transition: 'opacity 0.7s ease, transform 0.7s ease',
@@ -1195,11 +1180,12 @@ function HomePage() {
             />
             <div className="relative z-[1]">
               <h2
+                className="break-words"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(30px, 3.8vw, 50px)',
+                  fontSize: 'clamp(28px, 6vw, 50px)',
                   fontWeight: 700,
-                  letterSpacing: '-1.5px',
+                  letterSpacing: '-1.2px',
                   color: 'var(--text)',
                   lineHeight: 1.1,
                   marginBottom: 14,
@@ -1207,7 +1193,7 @@ function HomePage() {
               >
                 Ready to start talking?
               </h2>
-              <p className="text-[17px] font-light mb-9" style={{ color: 'var(--text-muted)' }}>
+              <p className="text-[15px] md:text-[17px] font-light mb-9" style={{ color: 'var(--text-muted)' }}>
                 Join millions learning, playing, and connecting on Brolyu.
               </p>
               <div className="flex gap-3 justify-center flex-wrap">
@@ -1226,7 +1212,7 @@ function HomePage() {
                   Start Talking
                 </a>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/rzkadltm/brolyu-web"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-full font-medium no-underline border transition-all duration-200"
@@ -1276,7 +1262,7 @@ function HomePage() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t py-10" style={{ borderColor: 'var(--border)' }}>
-        <div className="max-w-[1280px] mx-auto px-8 flex items-center justify-between flex-wrap gap-5">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8 flex items-center justify-between flex-wrap gap-5">
           <div className="text-[13px]" style={{ color: 'var(--text-dim)' }}>
             © 2026 Brolyu. Open source — MIT License.
           </div>
