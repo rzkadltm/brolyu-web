@@ -229,7 +229,7 @@ function MessagesPage() {
     <div className="flex flex-1 overflow-hidden">
 
       {/* Conversation Panel */}
-      <div className="mp-convo-panel">
+      <div className="mp-convo-panel hidden md:flex">
         <div className="px-4 pt-5 pb-3 flex-shrink-0">
           <div className="font-display text-[18px] font-bold tracking-[-0.4px] mb-3" style={{ color: 'var(--text)' }}>
             Messages
@@ -263,7 +263,7 @@ function MessagesPage() {
 
         {/* Chat Header */}
         <div
-          className="px-6 py-[14px] flex items-center justify-between flex-shrink-0 border-b"
+          className="px-4 md:px-6 py-[14px] flex items-center justify-between flex-shrink-0 border-b gap-3"
           style={{ borderColor: 'var(--border2)', backdropFilter: 'blur(12px)' }}
         >
           <div className="flex items-center gap-3">
@@ -396,7 +396,7 @@ function MessagesPage() {
       </div>
 
       {/* Profile Panel */}
-      <div className="mp-profile-panel">
+      <div className="mp-profile-panel hidden lg:flex">
         <div className="px-5 pt-7 pb-5 text-center border-b" style={{ borderColor: 'var(--border2)' }}>
           <div
             className="w-[72px] h-[72px] rounded-full flex items-center justify-center font-display text-[26px] font-bold text-white mx-auto mb-3 relative"
