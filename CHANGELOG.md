@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/rzkadltm/brolyu-web/compare/v1.14.0...v1.15.0) (2026-05-02)
+
+
+### Features
+
+* **room:** polish room page controls and sidebar UX ([#10](https://github.com/rzkadltm/brolyu-web/issues/10)) ([8428172](https://github.com/rzkadltm/brolyu-web/commit/8428172b86e9928b9f701d361fb5a1e857e8c262))
+
 # [1.14.0](https://github.com/rzkadltm/brolyu-web/compare/v1.13.1...v1.14.0) (2026-05-02)
 
 
