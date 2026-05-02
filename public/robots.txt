@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Disallow app-gated pages that have no standalone SEO value
+Disallow: /auth
+
+Sitemap: https://brolyu.com/sitemap.xml

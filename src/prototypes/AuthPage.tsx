@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 
 type Theme = 'dark' | 'light'
 
@@ -387,6 +388,12 @@ export default function AuthPage() {
 
   return (
     <div className="auth-root" data-theme={theme}>
+      <SEO
+        title={mode === 'signin' ? 'Sign In' : 'Create Account'}
+        description="Sign in to Brolyu or create a free account to join voice rooms, make friends, practice languages, and play games with people worldwide."
+        path="/auth"
+        noIndex
+      />
       <div className="auth-bg-orb auth-bg-orb-1" aria-hidden="true" />
       <div className="auth-bg-orb auth-bg-orb-2" aria-hidden="true" />
       <div className="auth-bg-orb auth-bg-orb-3" aria-hidden="true" />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 import { ROOMS } from '../data/rooms'
 import type { Room, TagColor } from '../data/rooms'
 
@@ -168,6 +169,11 @@ function AppPage() {
 
   return (
     <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
+      <SEO
+        title="Discover Rooms"
+        description={`Browse ${liveCount} live voice rooms on Brolyu. Find study groups, language exchange partners, gaming rooms, and friend circles. Join thousands of people connecting right now.`}
+        path="/app"
+      />
       {/* Icon Rail */}
       <div className="ap-rail">
         <div className="ap-rail-logo">B</div>

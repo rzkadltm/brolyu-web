@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 
 type DmConvo = {
   id: number
@@ -238,7 +239,11 @@ function MessagesPage() {
 
   return (
     <div className="ap-root flex h-screen overflow-hidden" data-theme={theme}>
-
+      <SEO
+        title="Messages"
+        description="Chat and connect with your Brolyu friends and language exchange partners. Send messages, share voice clips, and keep conversations going."
+        path="/messages"
+      />
       {/* Icon Rail */}
       <div className="ap-rail">
         <div className="ap-rail-logo">B</div>

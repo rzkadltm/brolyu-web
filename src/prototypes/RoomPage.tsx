@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 import { ROOMS } from '../data/rooms'
 import type { Room } from '../data/rooms'
 
@@ -193,7 +194,15 @@ export default function RoomPage() {
 
   return (
     <div className="ap-root" data-theme={theme} style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-
+      <SEO
+        title={room ? `${room.name} — Voice Room` : 'Voice Room'}
+        description={
+          room
+            ? `Join "${room.name}" on Brolyu — a live voice room with ${room.listeners} listeners. ${room.tags.map(t => t.label).join(', ')}.`
+            : 'Join a live voice room on Brolyu and connect with people worldwide.'
+        }
+        path={`/room/${id ?? ''}`}
+      />
       {/* Icon Rail */}
       <div className="ap-rail">
         <Link to="/app" style={{ textDecoration: 'none' }}>

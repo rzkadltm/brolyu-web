@@ -1,0 +1,28 @@
+{
+  "name": "Brolyu",
+  "short_name": "Brolyu",
+  "description": "Connect with people worldwide through live voice rooms. Make friends, learn languages, study together, and play games.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090f",
+  "theme_color": "#6366f1",
+  "lang": "en",
+  "categories": ["social", "education", "games"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.svg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Brolyu — Connect, Learn & Play Together"
+    }
+  ]
+}
