@@ -201,7 +201,7 @@ function MessagesPage() {
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [msgs, showTyping])
+  }, [msgs, showTyping, mobileThreadOpen])
 
   useEffect(() => {
     if (!profileOpen) return
