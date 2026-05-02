@@ -122,6 +122,8 @@ export default function RoomPage() {
   const room = ROOMS.find(r => r.id === Number(id))
 
   const [theme, setTheme]               = useState<'dark' | 'light'>('dark')
+  const [sidebarOpen, setSidebarOpen]   = useState(true)
+  const [chatOpen, setChatOpen]         = useState(false)
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
   const [sidebarSearch, setSidebarSearch] = useState('')
   const [muted, setMuted]               = useState(false)
@@ -224,40 +226,52 @@ export default function RoomPage() {
       </div>
 
       {/* Sidebar */}
-      <div className="rp-sidebar">
-        <div className="rp-sidebar-header">
-          <div className="rp-sidebar-title">Voice Rooms</div>
-          <div className="rp-search-bar">
-            <span style={{ fontSize: 14, color: 'var(--text-d)', flexShrink: 0 }}>🔍</span>
-            <input
-              className="rp-search-input"
-              placeholder="Search rooms..."
-              value={sidebarSearch}
-              onChange={e => setSidebarSearch(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="rp-filter-row">
-          {SIDEBAR_FILTERS.map(f => (
-            <div
-              key={f}
-              className={`rp-filter-chip${sidebarFilter === f ? ' active' : ''}`}
-              onClick={() => setSidebarFilter(f)}
-            >
-              {f}
+      <div className="relative flex-shrink-0" style={{ width: sidebarOpen ? 300 : 0 }}>
+        {sidebarOpen && (
+          <div className="rp-sidebar">
+            <div className="rp-sidebar-header">
+              <div className="rp-sidebar-title">Voice Rooms</div>
+              <div className="rp-search-bar">
+                <span style={{ fontSize: 14, color: 'var(--text-d)', flexShrink: 0 }}>🔍</span>
+                <input
+                  className="rp-search-input"
+                  placeholder="Search rooms..."
+                  value={sidebarSearch}
+                  onChange={e => setSidebarSearch(e.target.value)}
+                />
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="rp-room-list">
-          {filteredSidebar.map(r => (
-            <RoomCard
-              key={r.id}
-              room={r}
-              active={r.id === room.id}
-              onClick={() => navigate(`/room/${r.id}`)}
-            />
-          ))}
-        </div>
+            <div className="rp-filter-row">
+              {SIDEBAR_FILTERS.map(f => (
+                <div
+                  key={f}
+                  className={`rp-filter-chip${sidebarFilter === f ? ' active' : ''}`}
+                  onClick={() => setSidebarFilter(f)}
+                >
+                  {f}
+                </div>
+              ))}
+            </div>
+            <div className="rp-room-list">
+              {filteredSidebar.map(r => (
+                <RoomCard
+                  key={r.id}
+                  room={r}
+                  active={r.id === room.id}
+                  onClick={() => navigate(`/room/${r.id}`)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        <button
+          type="button"
+          className="rp-sidebar-toggle"
+          aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+          onClick={() => setSidebarOpen(o => !o)}
+        >
+          {sidebarOpen ? '‹' : '›'}
+        </button>
       </div>
 
       {/* Center Stage */}
@@ -276,8 +290,6 @@ export default function RoomPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button className="rp-stage-action-btn">📋 Lesson</button>
-            <button className="rp-stage-action-btn">✨ AI Assist</button>
             <button className={`rp-copy-btn${copied ? ' copied' : ''}`} onClick={copyLink}>
               {copied ? '✓ Copied!' : '🔗 Copy Link'}
             </button>
@@ -313,28 +325,26 @@ export default function RoomPage() {
               <div className="rp-listener-more">+{extraListeners}</div>
             )}
           </div>
-          <button className="rp-raise-hand-btn">✋ Raise Hand</button>
+          <button className="rp-raise-hand-btn">✋ Request to Talk</button>
         </div>
 
         {/* Controls */}
         <div className="rp-controls">
-          <div className="rp-ctrl-btn" title="Video">📹</div>
-          <div className="rp-ctrl-btn" title="Screen share">🖥️</div>
           <button
             className={`rp-ctrl-mic${muted ? ' muted' : ''}`}
             onClick={() => setMuted(m => !m)}
             title={muted ? 'Unmute' : 'Mute'}
           >
-            {muted ? '🔇' : '🎙️'}
+            🎙️
           </button>
-          <div className="rp-ctrl-btn active" title="Chat">💬</div>
-          <div className="rp-ctrl-btn" title="AI tools">🤖</div>
-          <div className="rp-ctrl-btn danger" title="End">📵</div>
+          <button type="button" className={`rp-ctrl-btn${chatOpen ? ' active' : ''}`} title="Chat" onClick={() => setChatOpen(o => !o)}>💬</button>
+          <div className="rp-ctrl-btn" title="Video">📹</div>
+          <div className="rp-ctrl-btn" title="Screen share">🖥️</div>
         </div>
       </div>
 
       {/* Right Chat */}
-      <div className="rp-chat-panel">
+      {chatOpen && <div className="rp-chat-panel">
         <div className="rp-chat-header">
           <div className="rp-chat-header-title">Room Chat</div>
           <div style={{ fontSize: 12, color: 'var(--text-d)' }}>Chat</div>
@@ -379,7 +389,7 @@ export default function RoomPage() {
           />
           <button className="rp-send-btn" onClick={sendMsg}>➤</button>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }
