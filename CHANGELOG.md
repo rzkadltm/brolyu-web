@@ -1,3 +1,10 @@
+## [1.20.2](https://github.com/rzkadltm/brolyu-web/compare/v1.20.1...v1.20.2) (2026-05-03)
+
+
+### Bug Fixes
+
+* **app:** stop topbar reflow during auth hydration ([#15](https://github.com/rzkadltm/brolyu-web/issues/15)) ([ee2dca4](https://github.com/rzkadltm/brolyu-web/commit/ee2dca42066e885ddcde5228380bdfe26122b18c))
+
 ## [1.20.1](https://github.com/rzkadltm/brolyu-web/compare/v1.20.0...v1.20.1) (2026-05-03)
 
 
