@@ -1,3 +1,10 @@
+# [1.20.0](https://github.com/rzkadltm/brolyu-web/compare/v1.19.0...v1.20.0) (2026-05-03)
+
+
+### Features
+
+* **app:** open /app to guests and restrict sign-in to Google ([3148fa2](https://github.com/rzkadltm/brolyu-web/commit/3148fa2c8c10281607704b013ee8e99d193ada17))
+
 # [1.19.0](https://github.com/rzkadltm/brolyu-web/compare/v1.18.0...v1.19.0) (2026-05-03)
 
 
