@@ -8,16 +8,15 @@ interface Props {
 
 export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Only enter the loading state when there's a token to validate. Without
+  // this, guest-accessible routes (e.g. /app) render their signed-out UI for
+  // a tick before swapping in the authed UI on hydrate.
+  const [loading, setLoading] = useState(() => tokenStore.get() !== null)
 
   useEffect(() => {
+    if (!loading) return
     let cancelled = false
     async function hydrate() {
-      const token = tokenStore.get()
-      if (!token) {
-        setLoading(false)
-        return
-      }
       try {
         const me = await api.me()
         if (!cancelled) setUser(me)
@@ -31,6 +30,8 @@ export function AuthProvider({ children }: Props) {
     return () => {
       cancelled = true
     }
+    // Hydration runs once on mount; `loading` is only read for the initial guard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const signInWithEmail = useCallback(async (email: string) => {
