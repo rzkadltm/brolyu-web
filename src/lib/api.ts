@@ -14,7 +14,7 @@ export interface User {
   bio: string | null
   status: 'online' | 'away' | 'offline' | 'in_room'
   createdAt: string
-  // Only present on /auth/me; auth flows omit it.
+  // Only present on /api/v1/auth/me; auth flows omit it.
   identities?: Identity[]
 }
 
@@ -32,7 +32,12 @@ export class ApiError extends Error {
   }
 }
 
-const BASE = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+// Server mounts the public API under /api/v1 with URI versioning. Bake the
+// prefix into BASE so every call site stays clean. Operational probes (/, /health)
+// and the legacy /auth/google* aliases live outside this prefix on the server.
+const BASE =
+  (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '') +
+  '/api/v1'
 
 const TOKEN_KEY = 'brolyu_token'
 
@@ -99,7 +104,4 @@ export const api = {
   // Generic OAuth start. Add a provider on the server (one new file +
   // module entry) and you can call oauthStartUrl('github') here too.
   oauthStartUrl: (provider: string) => `${BASE}/auth/oauth/${provider}`,
-
-  /** @deprecated use oauthStartUrl('google'). Kept for the alias route. */
-  googleStartUrl: () => `${BASE}/auth/oauth/google`,
 }
