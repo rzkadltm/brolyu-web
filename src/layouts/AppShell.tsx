@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/useTheme'
 
 function AppShell() {
   const { theme, toggleTheme } = useTheme()
-  const { user, signOut } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const isApp = pathname === '/app'
@@ -72,7 +72,9 @@ function AppShell() {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
-          {user ? (
+          {loading ? (
+            <div className="ap-rail-avatar opacity-60" aria-hidden="true" />
+          ) : user ? (
             <div className="relative">
               <button
                 ref={triggerRef}
