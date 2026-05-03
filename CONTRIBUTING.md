@@ -39,7 +39,7 @@ By participating in this project you agree to abide by our [Code of Conduct](COD
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone git@github.com:<your-username>/brolyu-web.git
-cd web-frontend
+cd brolyu-web
 
 # 2. Add the upstream remote
 git remote add upstream git@github.com:rzkadltm/brolyu-web.git
@@ -151,7 +151,7 @@ Open an issue using the **Feature Request** template and describe:
 
 - **TypeScript** — Strict mode is enabled. Avoid `any`; prefer explicit types.
 - **React** — Functional components only. Keep components small and focused.
-- **CSS** — Use CSS Modules or scoped styles. Avoid global class name collisions.
+- **CSS** — Tailwind utility classes in JSX. No CSS Modules or per-component `.css` files. Add to `src/index.css` `@layer base` only for things that genuinely can't be utilities (e.g. element-level resets).
 - **Naming** — `PascalCase` for components, `camelCase` for functions and variables, `SCREAMING_SNAKE_CASE` for constants.
 - **Imports** — Sort: external packages → internal modules → styles.
 - **No dead code** — Remove console logs, commented-out code, and unused imports before submitting.

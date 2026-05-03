@@ -22,6 +22,11 @@ Brolyu is an open-source social platform that brings people together through rea
 | UI Framework | React 19 + TypeScript |
 | Build Tool | Vite |
 | Styling | Tailwind CSS v4 |
+| Routing | React Router v7 |
+| Animation | Motion |
+| SEO | React Helmet Async |
+| Hosting | Cloudflare Workers (via Wrangler) |
+| Releases | semantic-release |
 | Real-time | WebRTC (planned) |
 | Linting | ESLint + typescript-eslint |
 
@@ -37,7 +42,7 @@ Brolyu is an open-source social platform that brings people together through rea
 ```bash
 # Clone the repository
 git clone git@github.com:rzkadltm/brolyu-web.git
-cd web-frontend
+cd brolyu-web
 
 # Install dependencies
 npm install
@@ -55,24 +60,33 @@ The app will be available at `http://localhost:5173`.
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start the development server with HMR |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview the production build locally |
+| `npm run dev` | Start the Vite dev server with HMR |
+| `npm run build` | Type-check (`tsc -b`) then build for production |
+| `npm run preview` | Build, then serve via `wrangler dev` (Workers runtime) |
+| `npm run deploy` | Build and deploy to Cloudflare Workers |
 | `npm run lint` | Run ESLint across the codebase |
 
 ## Project Structure
 
 ```
-web-frontend/
-├── public/           # Static assets (favicon, svg sprites)
+brolyu-web/
+├── public/             # Static assets served as-is (favicon, icons.svg sprite, robots, sitemap)
 ├── src/
-│   ├── assets/       # Images and icons imported by components
-│   ├── App.tsx       # Root application component
-│   ├── main.tsx      # Entry point
-│   └── index.css     # Tailwind import + global base styles
-├── index.html        # HTML shell
-├── vite.config.ts    # Vite configuration
-└── tsconfig.json     # TypeScript configuration
+│   ├── assets/         # Images and icons imported by components
+│   ├── components/     # Shared UI (Avatar, Chip, IconRail, SearchInput, SEO, RequireAuth)
+│   ├── contexts/       # AuthProvider, ThemeProvider and their hooks
+│   ├── data/           # Static fixtures (e.g. rooms.ts)
+│   ├── features/       # Feature-scoped UI (discover, profile)
+│   ├── layouts/        # Route layouts (AppShell)
+│   ├── lib/            # Cross-cutting helpers (api.ts client + token store)
+│   ├── pages/          # Top-level routed pages (Home, Auth, App, Messages, Room, …)
+│   ├── App.tsx         # Routing tree
+│   ├── main.tsx        # Entry point (mounts providers)
+│   └── index.css       # Tailwind import, design tokens, base layer
+├── index.html          # HTML shell
+├── vite.config.ts      # Vite configuration
+├── wrangler.jsonc      # Cloudflare Workers configuration
+└── tsconfig*.json      # TypeScript project references
 ```
 
 ## Contributing
