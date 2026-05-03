@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/rzkadltm/brolyu-web/compare/v1.18.0...v1.19.0) (2026-05-03)
+
+
+### Features
+
+* **profile:** replace color avatars with image uploads ([8d1853d](https://github.com/rzkadltm/brolyu-web/commit/8d1853d362a088910836485931590dca91d0c484))
+
 # [1.18.0](https://github.com/rzkadltm/brolyu-web/compare/v1.17.0...v1.18.0) (2026-05-02)
 
 
