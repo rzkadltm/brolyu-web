@@ -1,25 +1,30 @@
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../../contexts/useAuth'
 
 type RailItem = {
   icon: string
   label: string
   to: string
   badge?: number
+  requiresAuth?: boolean
 }
 
 const ITEMS: RailItem[] = [
   { to: '/app', icon: '🏠', label: 'Discover' },
-  { to: '/messages', icon: '💬', label: 'Messages', badge: 3 },
+  { to: '/messages', icon: '💬', label: 'Messages', badge: 3, requiresAuth: true },
 ]
 
 function IconRail() {
+  const { user } = useAuth()
+  const items = ITEMS.filter(item => !item.requiresAuth || user)
+
   return (
     <>
       {/* Desktop side rail */}
       <nav className="ap-rail hidden md:flex" aria-label="Primary">
         <div className="ap-rail-logo" aria-hidden="true">B</div>
         <div className="ap-rail-sep" />
-        {ITEMS.map(item => (
+        {items.map(item => (
           <NavLink
             key={item.label}
             to={item.to}
@@ -34,7 +39,7 @@ function IconRail() {
 
       {/* Mobile bottom nav */}
       <nav className="ap-rail-mobile md:hidden" aria-label="Primary">
-        {ITEMS.map(item => (
+        {items.map(item => (
           <NavLink
             key={item.label}
             to={item.to}

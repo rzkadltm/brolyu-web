@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { SEO } from '../components/SEO'
 import { ROOMS } from '../data/rooms'
 import type { Room, TagColor } from '../data/rooms'
+import { useAuth } from '../contexts/useAuth'
 
 const FILTERS = ['All', 'Language', 'Study', 'Games', 'Friends', 'Beginner', 'Advanced']
 
@@ -19,7 +20,16 @@ const WAVE_HEIGHTS = [8, 12, 5, 12]
 
 function RoomCard({ room, index }: { room: Room; index: number }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const hasSpeaking = room.live && room.speakers.some(s => s.speaking)
+
+  function handleAction() {
+    if (!user) {
+      navigate('/auth', { state: { from: `/room/${room.id}` } })
+      return
+    }
+    if (room.live) navigate(`/room/${room.id}`)
+  }
 
   return (
     <div className="ap-room-card" style={{ animationDelay: `${index * 0.06}s` }}>
@@ -127,7 +137,7 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
         </div>
         <button
           className={`ap-join-btn ${room.live ? 'live' : 'soon'}`}
-          onClick={room.live ? () => navigate(`/room/${room.id}`) : undefined}
+          onClick={!user || room.live ? handleAction : undefined}
         >
           {room.live ? 'Join ↗' : 'Notify me'}
         </button>
@@ -139,6 +149,15 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
 function AppPage() {
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
+  function handleCreateRoom() {
+    if (!user) {
+      navigate('/auth', { state: { from: '/app' } })
+      return
+    }
+  }
 
   const filtered = ROOMS.filter(room => {
     const matchFilter =
@@ -163,7 +182,11 @@ function AppPage() {
         path="/app"
       />
       {/* Topbar */}
-      <div className="shrink-0 pt-[18px] md:pt-[22px] pl-4 md:pl-8 pr-[64px] md:pr-[110px]">
+      <div
+        className={`shrink-0 pt-[18px] md:pt-[22px] pl-4 md:pl-8 ${
+          user ? 'pr-[64px] md:pr-[110px]' : 'pr-[150px] md:pr-[170px]'
+        }`}
+      >
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4 md:mb-5">
           <h1
             className="font-display text-[22px] md:text-[26px] font-bold tracking-[-0.8px]"
@@ -172,7 +195,7 @@ function AppPage() {
             Discover <span className="text-accent">Rooms</span>
           </h1>
           <div className="flex items-center gap-[10px]">
-            <button className="ap-create-btn">＋ Create Room</button>
+            <button className="ap-create-btn" onClick={handleCreateRoom}>＋ Create Room</button>
           </div>
         </div>
 

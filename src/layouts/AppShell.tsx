@@ -72,57 +72,63 @@ function AppShell() {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
-          <div className="relative">
-            <button
-              ref={triggerRef}
-              type="button"
-              aria-label="Account"
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              aria-controls={menuOpen ? menuId : undefined}
-              className="ap-rail-avatar"
-              onClick={() => setMenuOpen(o => !o)}
-            >
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt=""
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                initial
-              )}
-            </button>
-            {menuOpen && (
-              <div
-                ref={menuRef}
-                id={menuId}
-                role="menu"
-                aria-label="Account menu"
-                className="pf-menu"
+          {user ? (
+            <div className="relative">
+              <button
+                ref={triggerRef}
+                type="button"
+                aria-label="Account"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-controls={menuOpen ? menuId : undefined}
+                className="ap-rail-avatar"
+                onClick={() => setMenuOpen(o => !o)}
               >
-                <NavLink
-                  to="/profile"
-                  role="menuitem"
-                  className="pf-menu-item"
-                  onClick={() => setMenuOpen(false)}
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  initial
+                )}
+              </button>
+              {menuOpen && (
+                <div
+                  ref={menuRef}
+                  id={menuId}
+                  role="menu"
+                  aria-label="Account menu"
+                  className="pf-menu"
                 >
-                  <span className="pf-menu-item-icon" aria-hidden="true">👤</span>
-                  Profile
-                </NavLink>
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="pf-menu-item pf-menu-item-danger"
-                  onClick={handleSignOut}
-                >
-                  <span className="pf-menu-item-icon" aria-hidden="true">↩</span>
-                  Sign out
-                </button>
-              </div>
-            )}
-          </div>
+                  <NavLink
+                    to="/profile"
+                    role="menuitem"
+                    className="pf-menu-item"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="pf-menu-item-icon" aria-hidden="true">👤</span>
+                    Profile
+                  </NavLink>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="pf-menu-item pf-menu-item-danger"
+                    onClick={handleSignOut}
+                  >
+                    <span className="pf-menu-item-icon" aria-hidden="true">↩</span>
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <NavLink to="/auth" className="ap-create-btn">
+              Sign in
+            </NavLink>
+          )}
         </div>
         )}
         <Outlet />

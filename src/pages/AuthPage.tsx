@@ -1,18 +1,21 @@
-import { useEffect, useState, useRef } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
 import { SEO } from '../components/SEO'
 import { useAuth } from '../contexts/useAuth'
-import { ApiError } from '../lib/api'
+// Email/manual auth disabled — Google-only for now
+// import { useRef } from 'react'
+// import { useNavigate } from 'react-router-dom'
+// import { ApiError } from '../lib/api'
 
 type Theme = 'dark' | 'light'
 
 const POST_LOGIN_KEY = 'brolyu_post_login'
 
-interface AuthErrors {
-  name?: string
-  email?: string
-  form?: string
-}
+// interface AuthErrors {
+//   name?: string
+//   email?: string
+//   form?: string
+// }
 
 function readFromState(state: unknown): string | null {
   if (state && typeof state === 'object' && 'from' in state) {
@@ -34,54 +37,57 @@ function GoogleIcon() {
 }
 
 interface SignInFormProps {
-  onSwitch: () => void
+  // onSwitch: () => void  // tabs commented — Google-only auth for now
   redirectTo: string
 }
 
-function SignInForm({ onSwitch, redirectTo }: SignInFormProps) {
-  const { signInWithEmail, signInWithGoogle } = useAuth()
-  const [email, setEmail] = useState('')
+function SignInForm({ redirectTo }: SignInFormProps) {
+  const { signInWithGoogle } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<AuthErrors>({})
-  const [success, setSuccess] = useState(false)
-  const formRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
 
-  function validate(): AuthErrors {
-    const e: AuthErrors = {}
-    if (!email) e.email = 'Email is required'
-    else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Enter a valid email address'
-    return e
-  }
-
-  async function handleSubmit(ev: React.FormEvent) {
-    ev.preventDefault()
-    const e = validate()
-    setErrors(e)
-    if (Object.keys(e).length > 0) {
-      formRef.current?.classList.add('auth-shake')
-      setTimeout(() => formRef.current?.classList.remove('auth-shake'), 400)
-      return
-    }
-    setLoading(true)
-    try {
-      await signInWithEmail(email)
-      setSuccess(true)
-      navigate(redirectTo, { replace: true })
-    } catch (err) {
-      const msg =
-        err instanceof ApiError && err.status === 404
-          ? 'No account found for this email — try signing up.'
-          : err instanceof Error
-            ? err.message
-            : 'Sign-in failed'
-      setErrors({ form: msg })
-      formRef.current?.classList.add('auth-shake')
-      setTimeout(() => formRef.current?.classList.remove('auth-shake'), 400)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Email/manual sign-in disabled — Google-only auth for now
+  // const { signInWithEmail } = useAuth()
+  // const [email, setEmail] = useState('')
+  // const [errors, setErrors] = useState<AuthErrors>({})
+  // const [success, setSuccess] = useState(false)
+  // const formRef = useRef<HTMLDivElement>(null)
+  // const navigate = useNavigate()
+  //
+  // function validate(): AuthErrors {
+  //   const e: AuthErrors = {}
+  //   if (!email) e.email = 'Email is required'
+  //   else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Enter a valid email address'
+  //   return e
+  // }
+  //
+  // async function handleSubmit(ev: React.FormEvent) {
+  //   ev.preventDefault()
+  //   const e = validate()
+  //   setErrors(e)
+  //   if (Object.keys(e).length > 0) {
+  //     formRef.current?.classList.add('auth-shake')
+  //     setTimeout(() => formRef.current?.classList.remove('auth-shake'), 400)
+  //     return
+  //   }
+  //   setLoading(true)
+  //   try {
+  //     await signInWithEmail(email)
+  //     setSuccess(true)
+  //     navigate(redirectTo, { replace: true })
+  //   } catch (err) {
+  //     const msg =
+  //       err instanceof ApiError && err.status === 404
+  //         ? 'No account found for this email — try signing up.'
+  //         : err instanceof Error
+  //           ? err.message
+  //           : 'Sign-in failed'
+  //     setErrors({ form: msg })
+  //     formRef.current?.classList.add('auth-shake')
+  //     setTimeout(() => formRef.current?.classList.remove('auth-shake'), 400)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   function handleGoogleSignIn() {
     setLoading(true)
@@ -89,36 +95,40 @@ function SignInForm({ onSwitch, redirectTo }: SignInFormProps) {
     signInWithGoogle()
   }
 
-  if (success) {
-    return (
-      <div className="auth-success-card auth-fade-in">
-        <div className="auth-success-icon">✓</div>
-        <div className="auth-success-title">Welcome back!</div>
-        <div className="auth-success-sub">Signing you into Brolyu…<br />Redirecting to your rooms.</div>
-        <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => navigate(redirectTo, { replace: true })}>
-          Continue →
-        </button>
-      </div>
-    )
-  }
+  // Inline success card (email flow) commented — Google OAuth redirects via /auth/callback
+  // if (success) {
+  //   return (
+  //     <div className="auth-success-card auth-fade-in">
+  //       <div className="auth-success-icon">✓</div>
+  //       <div className="auth-success-title">Welcome back!</div>
+  //       <div className="auth-success-sub">Signing you into Brolyu…<br />Redirecting to your rooms.</div>
+  //       <button className="auth-submit-btn" style={{ marginTop: 8 }} onClick={() => navigate(redirectTo, { replace: true })}>
+  //         Continue →
+  //       </button>
+  //     </div>
+  //   )
+  // }
 
   return (
-    <div className="auth-card auth-fade-in" ref={formRef}>
+    <div className="auth-card auth-fade-in">
       <div className="auth-card-header">
-        <div className="auth-card-title">Welcome back</div>
-        <div className="auth-card-sub">Sign in with your email — no password needed</div>
+        <div className="auth-card-title">Welcome to Brolyu</div>
+        <div className="auth-card-sub">Sign in with Google to continue</div>
       </div>
 
+      {/* Sign In / Sign Up tabs commented — Google-only auth for now
       <div className="auth-tabs">
         <button className="auth-tab auth-tab-active" type="button">Sign In</button>
         <button className="auth-tab" type="button" onClick={onSwitch}>Sign Up</button>
       </div>
+      */}
 
       <button className="auth-oauth-btn" type="button" onClick={handleGoogleSignIn} disabled={loading}>
         <GoogleIcon />
         Continue with Google
       </button>
 
+      {/* Email sign-in form commented — Google-only auth for now
       <div className="auth-divider">
         <div className="auth-divider-line" />
         <span className="auth-divider-text">or sign in with email</span>
@@ -154,10 +164,14 @@ function SignInForm({ onSwitch, redirectTo }: SignInFormProps) {
         Don't have an account?{' '}
         <button type="button" className="auth-terms-link" onClick={onSwitch}>Create one free</button>
       </div>
+      */}
     </div>
   )
 }
 
+// SignUpForm commented out entirely — Google-only auth for now.
+// Re-enable when email/manual sign-up is brought back.
+/*
 interface SignUpFormProps {
   onSwitch: () => void
   redirectTo: string
@@ -306,6 +320,7 @@ function SignUpForm({ onSwitch, redirectTo }: SignUpFormProps) {
     </div>
   )
 }
+*/
 
 const FEATURES = [
   { icon: '🎙️', cls: 'auth-fi-1', title: 'Voice rooms', desc: 'Drop into live rooms and talk instantly' },
@@ -318,7 +333,8 @@ const SP_COLORS = ['#6366f1', '#0ea5e9', '#f59e0b', '#ec4899', '#14b8a6'] as con
 const SP_INITIALS = ['H', 'Y', 'P', 'Z', 'K'] as const
 
 export default function AuthPage() {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  // Mode switching disabled — Google-only auth for now
+  // const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [theme, setTheme] = useState<Theme>('dark')
   const { user, loading } = useAuth()
   const location = useLocation()
@@ -344,8 +360,8 @@ export default function AuthPage() {
   return (
     <div className="auth-root" data-theme={theme}>
       <SEO
-        title={mode === 'signin' ? 'Sign In' : 'Create Account'}
-        description="Sign in to Brolyu or create a free account to join voice rooms, make friends, practice languages, and play games with people worldwide."
+        title="Sign In"
+        description="Sign in to Brolyu with Google to join voice rooms, make friends, practice languages, and play games with people worldwide."
         path="/auth"
         noIndex
       />
@@ -409,10 +425,13 @@ export default function AuthPage() {
         </div>
 
         <div className="auth-right">
+          <SignInForm redirectTo={redirectTo} />
+          {/* Sign-up flow commented — Google-only auth for now
           {mode === 'signin'
             ? <SignInForm onSwitch={() => setMode('signup')} redirectTo={redirectTo} />
             : <SignUpForm onSwitch={() => setMode('signin')} redirectTo={redirectTo} />
           }
+          */}
         </div>
       </div>
     </div>

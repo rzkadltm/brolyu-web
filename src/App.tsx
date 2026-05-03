@@ -7,6 +7,7 @@ import RoomPage from './pages/RoomPage'
 import AuthCallback from './pages/AuthCallback'
 import AppShell from './layouts/AppShell'
 import ProfilePage from './features/profile/ProfilePage'
+import { RequireAuth } from './components/RequireAuth'
 
 function RoomPageKeyed() {
   const { id } = useParams()
@@ -22,9 +23,30 @@ function App() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route element={<AppShell />}>
           <Route path="/app" element={<AppPage />} />
-          <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/room/:id" element={<RoomPageKeyed />} />
+          <Route
+            path="/messages"
+            element={
+              <RequireAuth>
+                <MessagesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfilePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/room/:id"
+            element={
+              <RequireAuth>
+                <RoomPageKeyed />
+              </RequireAuth>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
