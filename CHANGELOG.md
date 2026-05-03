@@ -1,3 +1,10 @@
+## [1.20.1](https://github.com/rzkadltm/brolyu-web/compare/v1.20.0...v1.20.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **auth:** prevent sign-in flash on guest-accessible routes ([#14](https://github.com/rzkadltm/brolyu-web/issues/14)) ([4064c49](https://github.com/rzkadltm/brolyu-web/commit/4064c4973fd5af3934b43adb9da4865bd3e9b028))
+
 # [1.20.0](https://github.com/rzkadltm/brolyu-web/compare/v1.19.0...v1.20.0) (2026-05-03)
 
 
