@@ -49,8 +49,8 @@ function AppShell() {
     }
   }, [menuOpen])
 
-  const initial = user?.avatarInitial ?? user?.name?.[0] ?? 'U'
-  const avatarColor = user?.avatarColor ?? null
+  const initial = (user?.name?.trim()[0] ?? 'U').toUpperCase()
+  const avatarUrl = user?.avatarUrl ?? null
 
   function handleSignOut() {
     setMenuOpen(false)
@@ -81,10 +81,18 @@ function AppShell() {
               aria-expanded={menuOpen}
               aria-controls={menuOpen ? menuId : undefined}
               className="ap-rail-avatar"
-              style={avatarColor ? { background: avatarColor } : undefined}
               onClick={() => setMenuOpen(o => !o)}
             >
-              {initial}
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                initial
+              )}
             </button>
             {menuOpen && (
               <div

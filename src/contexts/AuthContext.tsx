@@ -11,9 +11,9 @@ export interface AuthContextValue {
   signInWithGoogle: () => void
   applyToken: (token: string) => Promise<User>
   signOut: () => void
-  updateProfile: (
-    patch: Partial<Pick<User, 'name' | 'bio' | 'avatarInitial' | 'avatarColor'>>,
-  ) => Promise<User>
+  updateProfile: (patch: Partial<Pick<User, 'name' | 'bio'>>) => Promise<User>
+  uploadAvatar: (file: File) => Promise<User>
+  removeAvatar: () => Promise<User>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

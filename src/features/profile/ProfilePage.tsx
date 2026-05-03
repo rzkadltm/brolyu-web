@@ -4,19 +4,6 @@ import { SEO } from '../../components/SEO'
 import { useAuth } from '../../contexts/useAuth'
 import { ApiError } from '../../lib/api'
 
-const PRESET_COLORS: { value: string; label: string }[] = [
-  { value: 'oklch(62% 0.22 265)', label: 'Indigo' },
-  { value: 'oklch(62% 0.22 300)', label: 'Violet' },
-  { value: 'oklch(68% 0.18 150)', label: 'Green' },
-  { value: 'oklch(70% 0.18 70)', label: 'Amber' },
-  { value: 'oklch(62% 0.22 25)', label: 'Red' },
-  { value: 'oklch(62% 0.22 15)', label: 'Rose' },
-  { value: 'oklch(64% 0.18 220)', label: 'Sky' },
-  { value: 'oklch(60% 0.18 340)', label: 'Pink' },
-  { value: 'oklch(58% 0.16 180)', label: 'Teal' },
-  { value: 'oklch(50% 0.04 280)', label: 'Slate' },
-]
-
 const NAME_MAX = 60
 const BIO_MAX = 240
 
@@ -27,33 +14,27 @@ const STATUS_LABELS: Record<'online' | 'away' | 'offline' | 'in_room', string> =
   in_room: 'In a room',
 }
 
+const ACCEPTED_MIME = ['image/png', 'image/jpeg', 'image/webp', 'image/gif']
+const ACCEPT_ATTR = ACCEPTED_MIME.join(',')
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024
+
 type FormState = {
   name: string
   bio: string
-  avatarInitial: string
-  avatarColor: string
 }
 
-function pickInitial(name: string, fallback: string): string {
-  const trimmed = fallback.trim()
-  if (trimmed) return trimmed[0].toUpperCase()
-  const fromName = name.trim()[0]
-  return (fromName ?? 'U').toUpperCase()
+function readErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof ApiError) return err.message
+  if (err instanceof Error) return err.message
+  return fallback
 }
 
 function ProfilePage() {
-  const { user, updateProfile } = useAuth()
+  const { user, updateProfile, uploadAvatar, removeAvatar } = useAuth()
 
   const initialForm = useMemo<FormState>(() => {
-    if (!user) {
-      return { name: '', bio: '', avatarInitial: '', avatarColor: PRESET_COLORS[0].value }
-    }
-    return {
-      name: user.name,
-      bio: user.bio ?? '',
-      avatarInitial: user.avatarInitial ?? '',
-      avatarColor: user.avatarColor ?? PRESET_COLORS[0].value,
-    }
+    if (!user) return { name: '', bio: '' }
+    return { name: user.name, bio: user.bio ?? '' }
   }, [user])
 
   const [form, setForm] = useState<FormState>(initialForm)
@@ -61,6 +42,12 @@ function ProfilePage() {
   const [error, setError] = useState<string | null>(null)
   const [savedAt, setSavedAt] = useState<number | null>(null)
   const savedTimerRef = useRef<number | null>(null)
+
+  const [avatarBusy, setAvatarBusy] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
+  const [avatarSavedAt, setAvatarSavedAt] = useState<number | null>(null)
+  const avatarSavedTimerRef = useRef<number | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Reset the form when the underlying user changes (post-hydration or after a
   // successful save). React's documented pattern: track the prior value in
@@ -74,6 +61,7 @@ function ProfilePage() {
   useEffect(() => {
     return () => {
       if (savedTimerRef.current !== null) window.clearTimeout(savedTimerRef.current)
+      if (avatarSavedTimerRef.current !== null) window.clearTimeout(avatarSavedTimerRef.current)
     }
   }, [])
 
@@ -87,15 +75,17 @@ function ProfilePage() {
     )
   }
 
-  const dirty =
-    form.name !== initialForm.name ||
-    form.bio !== initialForm.bio ||
-    form.avatarInitial !== initialForm.avatarInitial ||
-    form.avatarColor !== initialForm.avatarColor
+  const previewInitial = (user.name.trim()[0] ?? '?').toUpperCase()
 
+  const dirty = form.name !== initialForm.name || form.bio !== initialForm.bio
   const trimmedName = form.name.trim()
   const canSave = dirty && trimmedName.length > 0 && !saving
-  const previewInitial = pickInitial(form.name, form.avatarInitial)
+
+  function flashAvatarSaved() {
+    setAvatarSavedAt(Date.now())
+    if (avatarSavedTimerRef.current !== null) window.clearTimeout(avatarSavedTimerRef.current)
+    avatarSavedTimerRef.current = window.setTimeout(() => setAvatarSavedAt(null), 2000)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -106,20 +96,12 @@ function ProfilePage() {
       await updateProfile({
         name: trimmedName,
         bio: form.bio.trim() || null,
-        avatarInitial: form.avatarInitial.trim().toUpperCase().slice(0, 1) || null,
-        avatarColor: form.avatarColor || null,
       })
       setSavedAt(Date.now())
       if (savedTimerRef.current !== null) window.clearTimeout(savedTimerRef.current)
       savedTimerRef.current = window.setTimeout(() => setSavedAt(null), 2000)
     } catch (err) {
-      const message =
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : 'Could not save changes. Try again.'
-      setError(message)
+      setError(readErrorMessage(err, 'Could not save changes. Try again.'))
     } finally {
       setSaving(false)
     }
@@ -129,6 +111,53 @@ function ProfilePage() {
     setForm(initialForm)
     setError(null)
     setSavedAt(null)
+  }
+
+  function handlePickPhoto() {
+    fileInputRef.current?.click()
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const input = e.target
+    const file = input.files?.[0] ?? null
+    // Reset so picking the same file again still triggers change.
+    input.value = ''
+    if (!file) return
+
+    setAvatarError(null)
+    if (!ACCEPTED_MIME.includes(file.type)) {
+      setAvatarError('Unsupported format. Use PNG, JPEG, WebP, or GIF.')
+      return
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      setAvatarError('Image too large. Max 5 MB.')
+      return
+    }
+
+    setAvatarBusy(true)
+    try {
+      await uploadAvatar(file)
+      flashAvatarSaved()
+    } catch (err) {
+      setAvatarError(readErrorMessage(err, 'Upload failed. Try again.'))
+    } finally {
+      setAvatarBusy(false)
+    }
+  }
+
+  async function handleRemovePhoto() {
+    if (!user?.avatarUrl) return
+    if (!window.confirm('Remove your profile photo?')) return
+    setAvatarBusy(true)
+    setAvatarError(null)
+    try {
+      await removeAvatar()
+      flashAvatarSaved()
+    } catch (err) {
+      setAvatarError(readErrorMessage(err, 'Could not remove photo. Try again.'))
+    } finally {
+      setAvatarBusy(false)
+    }
   }
 
   return (
@@ -149,6 +178,67 @@ function ProfilePage() {
             </p>
           </header>
 
+          {/* Avatar card — uploads commit immediately, separate from the form below. */}
+          <section className="pf-card">
+            <div className="pf-card-title">Avatar</div>
+
+            {avatarError && (
+              <div className="pf-banner pf-banner-error" role="alert">
+                {avatarError}
+              </div>
+            )}
+            {avatarSavedAt !== null && !avatarError && (
+              <div className="pf-banner pf-banner-success" role="status">
+                Saved
+              </div>
+            )}
+
+            <div className="flex flex-col md:flex-row md:items-center gap-6">
+              <div className="flex justify-center md:justify-start">
+                <Avatar
+                  initial={previewInitial}
+                  src={user.avatarUrl}
+                  size={104}
+                  className="rounded-full flex items-center justify-center font-display font-bold text-white"
+                  style={{
+                    fontSize: 38,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                  }}
+                />
+              </div>
+              <div className="flex-1 flex flex-col gap-3">
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    className="pf-btn pf-btn-primary"
+                    onClick={handlePickPhoto}
+                    disabled={avatarBusy}
+                  >
+                    {avatarBusy ? 'Working…' : user.avatarUrl ? 'Change photo' : 'Upload photo'}
+                  </button>
+                  {user.avatarUrl && (
+                    <button
+                      type="button"
+                      className="pf-btn pf-btn-ghost"
+                      onClick={handleRemovePhoto}
+                      disabled={avatarBusy}
+                    >
+                      Remove photo
+                    </button>
+                  )}
+                </div>
+                <p className="pf-help">PNG, JPEG, WebP, or GIF. Up to 5 MB.</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={ACCEPT_ATTR}
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
+            </div>
+          </section>
+
           {error && (
             <div className="pf-banner pf-banner-error" role="alert">
               {error}
@@ -161,68 +251,6 @@ function ProfilePage() {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Avatar card */}
-            <section className="pf-card">
-              <div className="pf-card-title">Avatar</div>
-              <div className="flex flex-col md:flex-row md:items-center gap-6">
-                <div className="flex justify-center md:justify-start">
-                  <Avatar
-                    initial={previewInitial}
-                    color={form.avatarColor}
-                    size={88}
-                    className="rounded-full flex items-center justify-center font-display font-bold text-white"
-                    style={{
-                      fontSize: 32,
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-                    }}
-                  />
-                </div>
-                <div className="flex-1 flex flex-col gap-4">
-                  <div className="pf-field">
-                    <label className="pf-label" htmlFor="pf-initial">
-                      Initial
-                    </label>
-                    <input
-                      id="pf-initial"
-                      className="pf-input pf-input-mono"
-                      maxLength={1}
-                      value={form.avatarInitial}
-                      placeholder={pickInitial(form.name, '')}
-                      onChange={e =>
-                        setForm(f => ({
-                          ...f,
-                          avatarInitial: e.target.value.toUpperCase().slice(0, 1),
-                        }))
-                      }
-                    />
-                    <div className="pf-help">A single character. Falls back to the first letter of your name.</div>
-                  </div>
-
-                  <div className="pf-field">
-                    <span className="pf-label">Color</span>
-                    <div className="pf-color-grid" role="radiogroup" aria-label="Avatar color">
-                      {PRESET_COLORS.map(c => {
-                        const selected = form.avatarColor === c.value
-                        return (
-                          <button
-                            key={c.value}
-                            type="button"
-                            role="radio"
-                            aria-checked={selected}
-                            aria-label={c.label}
-                            title={c.label}
-                            className={`pf-swatch${selected ? ' selected' : ''}`}
-                            style={{ background: c.value }}
-                            onClick={() => setForm(f => ({ ...f, avatarColor: c.value }))}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
             {/* Identity card */}
             <section className="pf-card">
               <div className="pf-card-title">About you</div>

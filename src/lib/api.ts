@@ -10,8 +10,7 @@ export interface User {
   emailVerified: boolean
   username: string
   name: string
-  avatarColor: string | null
-  avatarInitial: string | null
+  avatarUrl: string | null
   bio: string | null
   status: 'online' | 'away' | 'offline' | 'in_room'
   createdAt: string
@@ -43,9 +42,11 @@ export const tokenStore = {
   clear: () => localStorage.removeItem(TOKEN_KEY),
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function send<T>(path: string, init: RequestInit, jsonBody: boolean): Promise<T> {
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  if (jsonBody && init.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
   const token = tokenStore.get()
   if (token) headers.set('Authorization', `Bearer ${token}`)
 
@@ -63,6 +64,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return data as T
 }
 
+function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  return send<T>(path, init, true)
+}
+
+function requestRaw<T>(path: string, init: RequestInit = {}): Promise<T> {
+  return send<T>(path, init, false)
+}
+
 export const api = {
   register: (email: string, name?: string) =>
     request<AuthSuccess>('/auth/register', {
@@ -75,13 +84,17 @@ export const api = {
       body: JSON.stringify({ email }),
     }),
   me: () => request<User>('/auth/me'),
-  updateProfile: (
-    body: Partial<Pick<User, 'name' | 'bio' | 'avatarInitial' | 'avatarColor'>>,
-  ) =>
+  updateProfile: (body: Partial<Pick<User, 'name' | 'bio'>>) =>
     request<User>('/auth/me', {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+  uploadAvatar: (file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return requestRaw<User>('/auth/me/avatar', { method: 'POST', body: fd })
+  },
+  deleteAvatar: () => requestRaw<User>('/auth/me/avatar', { method: 'DELETE' }),
 
   // Generic OAuth start. Add a provider on the server (one new file +
   // module entry) and you can call oauthStartUrl('github') here too.
@@ -90,4 +103,3 @@ export const api = {
   /** @deprecated use oauthStartUrl('google'). Kept for the alias route. */
   googleStartUrl: () => `${BASE}/auth/oauth/google`,
 }
-

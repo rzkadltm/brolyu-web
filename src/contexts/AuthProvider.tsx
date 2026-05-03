@@ -66,13 +66,25 @@ export function AuthProvider({ children }: Props) {
   }, [])
 
   const updateProfile = useCallback(
-    async (patch: Partial<Pick<User, 'name' | 'bio' | 'avatarInitial' | 'avatarColor'>>) => {
+    async (patch: Partial<Pick<User, 'name' | 'bio'>>) => {
       const updated = await api.updateProfile(patch)
       setUser(updated)
       return updated
     },
     [],
   )
+
+  const uploadAvatar = useCallback(async (file: File) => {
+    const updated = await api.uploadAvatar(file)
+    setUser(updated)
+    return updated
+  }, [])
+
+  const removeAvatar = useCallback(async () => {
+    const updated = await api.deleteAvatar()
+    setUser(updated)
+    return updated
+  }, [])
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -85,6 +97,8 @@ export function AuthProvider({ children }: Props) {
       applyToken,
       signOut,
       updateProfile,
+      uploadAvatar,
+      removeAvatar,
     }),
     [
       user,
@@ -96,6 +110,8 @@ export function AuthProvider({ children }: Props) {
       applyToken,
       signOut,
       updateProfile,
+      uploadAvatar,
+      removeAvatar,
     ],
   )
 

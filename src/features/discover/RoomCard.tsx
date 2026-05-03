@@ -60,12 +60,11 @@ function RoomCard({ room, index }: RoomCardProps) {
               <Avatar
                 key={i}
                 initial={sp.initial}
-                color={sp.color}
                 size={36}
                 speaking={sp.speaking}
                 title={sp.name}
                 className={`ap-speaker-av${sp.speaking ? ' speaking' : ''}`}
-                style={{ zIndex: room.speakers.length - i }}
+                style={{ background: sp.color, zIndex: room.speakers.length - i }}
               />
             ))}
           </div>
