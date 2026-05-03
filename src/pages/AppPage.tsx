@@ -149,8 +149,11 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
 function AppPage() {
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
+  // While auth is hydrating with a stored token, reserve space as if the
+  // user is signed in so the topbar doesn't reflow when /auth/me resolves.
+  const reserveAuthed = !!user || loading
 
   function handleCreateRoom() {
     if (!user) {
@@ -184,7 +187,7 @@ function AppPage() {
       {/* Topbar */}
       <div
         className={`shrink-0 pt-[18px] md:pt-[22px] pl-4 md:pl-8 ${
-          user ? 'pr-[64px] md:pr-[110px]' : 'pr-[150px] md:pr-[170px]'
+          reserveAuthed ? 'pr-[64px] md:pr-[110px]' : 'pr-[150px] md:pr-[170px]'
         }`}
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4 md:mb-5">
