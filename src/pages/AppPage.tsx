@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SEO } from '../components/SEO'
-import { ROOMS } from '../data/rooms'
 import type { Room, TagColor } from '../data/rooms'
 import { useAuth } from '../contexts/useAuth'
+import { apiRoomToUiRoom, roomsApi } from '../features/rooms/api'
+import { CreateRoomModal } from '../features/rooms/CreateRoomModal'
 
 const FILTERS = ['All', 'Language', 'Study', 'Games', 'Friends', 'Beginner', 'Advanced']
 
@@ -149,20 +150,46 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
 function AppPage() {
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
+  const [rooms, setRooms] = useState<Room[]>([])
+  const [roomsLoading, setRoomsLoading] = useState(true)
+  const [roomsError, setRoomsError] = useState<string | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
   const { user, loading } = useAuth()
   const navigate = useNavigate()
   // While auth is hydrating with a stored token, reserve space as if the
   // user is signed in so the topbar doesn't reflow when /auth/me resolves.
   const reserveAuthed = !!user || loading
 
+  useEffect(() => {
+    let cancelled = false
+    roomsApi
+      .list()
+      .then(list => {
+        if (cancelled) return
+        setRooms(list.map(apiRoomToUiRoom))
+        setRoomsError(null)
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        setRoomsError(err instanceof Error ? err.message : 'Could not load rooms')
+      })
+      .finally(() => {
+        if (!cancelled) setRoomsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   function handleCreateRoom() {
     if (!user) {
       navigate('/auth', { state: { from: '/app' } })
       return
     }
+    setCreateOpen(true)
   }
 
-  const filtered = ROOMS.filter(room => {
+  const filtered = rooms.filter(room => {
     const matchFilter =
       filter === 'All' ||
       room.category === filter ||
@@ -230,16 +257,26 @@ function AppPage() {
       {/* Rooms scroll */}
       <div className="ap-rooms-scroll flex-1 overflow-y-auto px-4 md:px-8 pb-8">
         <div className="ap-section-label">
-          {filter === 'All'
-            ? `${liveCount} live rooms`
-            : `${filtered.length} rooms · ${filter}`}
+          {roomsLoading
+            ? 'Loading rooms…'
+            : filter === 'All'
+              ? `${liveCount} live rooms`
+              : `${filtered.length} rooms · ${filter}`}
         </div>
+        {roomsError && !roomsLoading && (
+          <div
+            className="text-center py-10 text-[13px]"
+            style={{ color: 'oklch(62% 0.22 15)' }}
+          >
+            {roomsError}
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((room, i) => (
             <RoomCard key={room.id} room={room} index={i} />
           ))}
         </div>
-        {filtered.length === 0 && (
+        {!roomsLoading && !roomsError && filtered.length === 0 && (
           <div
             className="text-center py-20 text-[14px]"
             style={{ color: 'var(--text-d)' }}
@@ -254,6 +291,16 @@ function AppPage() {
           </div>
         )}
       </div>
+
+      {createOpen && (
+        <CreateRoomModal
+          onClose={() => setCreateOpen(false)}
+          onCreated={room => {
+            setCreateOpen(false)
+            navigate(`/room/${room.publicId}`)
+          }}
+        />
+      )}
     </>
   )
 }

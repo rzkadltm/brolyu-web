@@ -8,7 +8,7 @@ export type Speaker = {
 }
 
 export type Room = {
-  id: number
+  id: string
   name: string
   live: boolean
   strip: string
@@ -21,7 +21,7 @@ export type Room = {
 
 export const ROOMS: Room[] = [
   {
-    id: 1, name: "Let's talk in English", live: true,
+    id: '1', name: "Let's talk in English", live: true,
     strip: 'linear-gradient(90deg,#6366f1,#8b5cf6)',
     speakers: [
       { initial: 'H', color: '#6366f1', name: 'Hussein', speaking: true },
@@ -32,7 +32,7 @@ export const ROOMS: Room[] = [
     listeners: 12, category: 'Language',
   },
   {
-    id: 2, name: 'Spanish × Japanese Exchange 🌏', live: true,
+    id: '2', name: 'Spanish × Japanese Exchange 🌏', live: true,
     strip: 'linear-gradient(90deg,#0ea5e9,#06b6d4)',
     speakers: [
       { initial: 'P', color: '#0ea5e9', name: 'Pablo', speaking: true },
@@ -43,7 +43,7 @@ export const ROOMS: Room[] = [
     listeners: 8, category: 'Language',
   },
   {
-    id: 3, name: 'IELTS Prep — AI Study Hall 📚', live: true,
+    id: '3', name: 'IELTS Prep — AI Study Hall 📚', live: true,
     strip: 'linear-gradient(90deg,#f59e0b,#f97316)',
     speakers: [
       { initial: 'J', color: '#f59e0b', name: 'Ji-su', speaking: true },
@@ -53,7 +53,7 @@ export const ROOMS: Room[] = [
     listeners: 34, category: 'Study',
   },
   {
-    id: 4, name: 'Word Blitz Battle 🎮 — Round 7', live: true,
+    id: '4', name: 'Word Blitz Battle 🎮 — Round 7', live: true,
     strip: 'linear-gradient(90deg,#ec4899,#f43f5e)',
     speakers: [
       { initial: 'Z', color: '#ec4899', name: 'Zara', speaking: true },
@@ -65,7 +65,7 @@ export const ROOMS: Room[] = [
     listeners: 6, category: 'Games',
   },
   {
-    id: 5, name: 'Chill Korean Corner ☕', live: true,
+    id: '5', name: 'Chill Korean Corner ☕', live: true,
     strip: 'linear-gradient(90deg,#8b5cf6,#a78bfa)',
     speakers: [
       { initial: 'E', color: '#8b5cf6', name: 'Eun', speaking: true },
@@ -76,7 +76,7 @@ export const ROOMS: Room[] = [
     listeners: 19, category: 'Language',
   },
   {
-    id: 6, name: 'Make Friends from Anywhere 🌍', live: true,
+    id: '6', name: 'Make Friends from Anywhere 🌍', live: true,
     strip: 'linear-gradient(90deg,#14b8a6,#06b6d4)',
     speakers: [
       { initial: 'N', color: '#14b8a6', name: 'Nadia', speaking: true },
@@ -86,7 +86,7 @@ export const ROOMS: Room[] = [
     listeners: 27, category: 'Friends',
   },
   {
-    id: 7, name: 'French for Beginners 🇫🇷', live: false,
+    id: '7', name: 'French for Beginners 🇫🇷', live: false,
     strip: 'linear-gradient(90deg,#3b82f6,#60a5fa)',
     speakers: [
       { initial: 'C', color: '#3b82f6', name: 'Camille' },
@@ -96,7 +96,7 @@ export const ROOMS: Room[] = [
     listeners: 0, category: 'Language', startsIn: 'in 20 min',
   },
   {
-    id: 8, name: 'Deep Talks — Philosophy & Life 🧠', live: true,
+    id: '8', name: 'Deep Talks — Philosophy & Life 🧠', live: true,
     strip: 'linear-gradient(90deg,#6366f1,#06b6d4)',
     speakers: [
       { initial: 'A', color: '#6366f1', name: 'Alex', speaking: true },
@@ -107,7 +107,7 @@ export const ROOMS: Room[] = [
     listeners: 41, category: 'Friends',
   },
   {
-    id: 9, name: 'Trivia Night — General Knowledge 🏆', live: true,
+    id: '9', name: 'Trivia Night — General Knowledge 🏆', live: true,
     strip: 'linear-gradient(90deg,#f59e0b,#ec4899)',
     speakers: [
       { initial: 'T', color: '#f59e0b', name: 'Tiago', speaking: true },
@@ -118,7 +118,7 @@ export const ROOMS: Room[] = [
     listeners: 22, category: 'Games',
   },
   {
-    id: 10, name: 'Spanish × Japanese Exchange 🌏', live: true,
+    id: '10', name: 'Spanish × Japanese Exchange 🌏', live: true,
     strip: 'linear-gradient(90deg,#0ea5e9,#06b6d4)',
     speakers: [
       { initial: 'P', color: '#0ea5e9', name: 'Pablo', speaking: true },
@@ -129,7 +129,7 @@ export const ROOMS: Room[] = [
     listeners: 8, category: 'Language',
   },
   {
-    id: 11, name: 'IELTS Prep — AI Study Hall 📚', live: true,
+    id: '11', name: 'IELTS Prep — AI Study Hall 📚', live: true,
     strip: 'linear-gradient(90deg,#f59e0b,#f97316)',
     speakers: [
       { initial: 'J', color: '#f59e0b', name: 'Ji-su', speaking: true },
@@ -139,7 +139,7 @@ export const ROOMS: Room[] = [
     listeners: 34, category: 'Study',
   },
   {
-    id: 12, name: 'Word Blitz Battle 🎮 — Round 7', live: true,
+    id: '12', name: 'Word Blitz Battle 🎮 — Round 7', live: true,
     strip: 'linear-gradient(90deg,#ec4899,#f43f5e)',
     speakers: [
       { initial: 'Z', color: '#ec4899', name: 'Zara', speaking: true },

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { SEO } from '../components/SEO'
-import { ROOMS } from '../data/rooms'
 import type { Room } from '../data/rooms'
+import { useAuth } from '../contexts/useAuth'
+import { apiRoomToUiRoom, roomsApi, type ApiRoom } from '../features/rooms/api'
 
 type TagColor = 'blue' | 'green' | 'purple' | 'amber' | 'rose'
 
@@ -118,8 +119,13 @@ function RoomCard({ room, active, onClick }: { room: Room; active: boolean; onCl
 export default function RoomPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
-  const room = ROOMS.find(r => r.id === Number(id))
+  const [apiRoom, setApiRoom] = useState<ApiRoom | null>(null)
+  const [room, setRoom] = useState<Room | null>(null)
+  const [roomLoading, setRoomLoading] = useState(true)
+  const [sidebarRooms, setSidebarRooms] = useState<Room[]>([])
+  const [endingRoom, setEndingRoom] = useState(false)
 
   const [sidebarOpen, setSidebarOpen]   = useState(true)
   const [chatOpen, setChatOpen]         = useState(false)
@@ -127,16 +133,68 @@ export default function RoomPage() {
   const [sidebarSearch, setSidebarSearch] = useState('')
   const [muted, setMuted]               = useState(false)
   const [activeSpeaker, setActiveSpeaker] = useState(0)
-  const [msgs, setMsgs]                 = useState<ChatMessage[]>(() => room ? buildInitialMessages(room) : [])
+  const [msgs, setMsgs]                 = useState<ChatMessage[]>([])
   const [inputVal, setInputVal]         = useState('')
   const [copied, setCopied]             = useState(false)
   const msgsEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!id) return
+    let cancelled = false
+    roomsApi
+      .get(id)
+      .then(api => {
+        if (cancelled) return
+        const ui = apiRoomToUiRoom(api)
+        setApiRoom(api)
+        setRoom(ui)
+        setMsgs(buildInitialMessages(ui))
+      })
+      .catch(() => {
+        if (cancelled) return
+        setApiRoom(null)
+        setRoom(null)
+      })
+      .finally(() => {
+        if (!cancelled) setRoomLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [id])
+
+  useEffect(() => {
+    let cancelled = false
+    roomsApi
+      .list()
+      .then(list => {
+        if (cancelled) return
+        setSidebarRooms(list.map(apiRoomToUiRoom))
+      })
+      .catch(() => {
+        // Sidebar is non-critical; swallow errors silently.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!room) return
     const t = setInterval(() => setActiveSpeaker(s => (s + 1) % room.speakers.length), 2800)
     return () => clearInterval(t)
   }, [room])
+
+  async function handleEndRoom() {
+    if (!apiRoom || endingRoom) return
+    setEndingRoom(true)
+    try {
+      await roomsApi.end(apiRoom.publicId)
+      navigate('/app')
+    } catch {
+      setEndingRoom(false)
+    }
+  }
 
   useEffect(() => {
     msgsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -160,7 +218,7 @@ export default function RoomPage() {
     setInputVal('')
   }
 
-  const filteredSidebar = ROOMS.filter(r => {
+  const filteredSidebar = sidebarRooms.filter(r => {
     const matchFilter =
       sidebarFilter === 'All Rooms' ||
       r.category === sidebarFilter ||
@@ -172,7 +230,15 @@ export default function RoomPage() {
     return matchFilter && matchSearch
   })
 
-  if (!room) {
+  if (roomLoading) {
+    return (
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-d)', fontSize: 14 }}>
+        Loading room…
+      </div>
+    )
+  }
+
+  if (!room || !apiRoom) {
     return (
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, color: 'var(--text)' }}>Room not found</div>
@@ -180,6 +246,8 @@ export default function RoomPage() {
       </div>
     )
   }
+
+  const isHost = !!user && apiRoom.host.id === user.id
 
   const speakers = room.speakers.map((s, i) => ({ ...s, speaking: i === activeSpeaker }))
   const visibleListeners = LISTENER_POOL.slice(0, Math.min(6, room.listeners))
@@ -265,6 +333,16 @@ export default function RoomPage() {
             <button className={`rp-copy-btn${copied ? ' copied' : ''}`} onClick={copyLink}>
               {copied ? '✓ Copied!' : '🔗 Copy Link'}
             </button>
+            {isHost && (
+              <button
+                className="rp-leave-btn"
+                onClick={handleEndRoom}
+                disabled={endingRoom}
+                style={{ background: 'oklch(62% 0.22 15)', color: 'white' }}
+              >
+                {endingRoom ? 'Ending…' : 'End Room ⏹'}
+              </button>
+            )}
             <button className="rp-leave-btn" onClick={() => navigate('/app')}>Leave ✕</button>
           </div>
         </div>
