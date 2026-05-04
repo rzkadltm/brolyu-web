@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/rzkadltm/brolyu-web/compare/v1.20.2...v1.21.0) (2026-05-04)
+
+
+### Features
+
+* **rooms:** wire rooms list, detail, create, and end to API ([#17](https://github.com/rzkadltm/brolyu-web/issues/17)) ([decd9be](https://github.com/rzkadltm/brolyu-web/commit/decd9bed3a780abfc4a23431bfcd876f571c2587))
+
 ## [1.20.2](https://github.com/rzkadltm/brolyu-web/compare/v1.20.1...v1.20.2) (2026-05-03)
 
 
