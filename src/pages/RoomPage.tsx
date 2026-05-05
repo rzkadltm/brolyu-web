@@ -4,6 +4,15 @@ import { SEO } from '../components/SEO'
 import type { Room } from '../data/rooms'
 import { useAuth } from '../contexts/useAuth'
 import { apiRoomToUiRoom, roomsApi, type ApiRoom } from '../features/rooms/api'
+import { useVoice } from '../features/voice/useVoice'
+
+function RemoteAudio({ stream }: { stream: MediaStream }) {
+  const ref = useRef<HTMLAudioElement>(null)
+  useEffect(() => {
+    if (ref.current) ref.current.srcObject = stream
+  }, [stream])
+  return <audio ref={ref} autoPlay playsInline />
+}
 
 type TagColor = 'blue' | 'green' | 'purple' | 'amber' | 'rose'
 
@@ -131,7 +140,8 @@ export default function RoomPage() {
   const [chatOpen, setChatOpen]         = useState(false)
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
   const [sidebarSearch, setSidebarSearch] = useState('')
-  const [muted, setMuted]               = useState(false)
+  const { connected, muted, remotes, error: voiceError, toggleMute } =
+    useVoice(apiRoom?.publicId)
   const [activeSpeaker, setActiveSpeaker] = useState(0)
   const [msgs, setMsgs]                 = useState<ChatMessage[]>([])
   const [inputVal, setInputVal]         = useState('')
@@ -378,11 +388,24 @@ export default function RoomPage() {
           <button className="rp-raise-hand-btn">✋ Request to Talk</button>
         </div>
 
+        {/* Hidden audio sinks for remote peers — autoplay starts after user
+            gesture (the click that opened the room or unmuted). */}
+        {remotes.map(r => (
+          <RemoteAudio key={r.peerId} stream={r.stream} />
+        ))}
+
+        {/* Voice status banner */}
+        <div style={{ padding: '4px 16px', fontSize: 12, color: 'var(--text-d)', display: 'flex', gap: 12, alignItems: 'center' }}>
+          <span>{connected ? '🟢 Voice connected' : '⚪ Voice connecting…'}</span>
+          <span>{remotes.length} peer{remotes.length === 1 ? '' : 's'}</span>
+          {voiceError && <span style={{ color: 'oklch(62% 0.22 15)' }}>⚠ {voiceError.message}</span>}
+        </div>
+
         {/* Controls */}
         <div className="rp-controls">
           <button
             className={`rp-ctrl-mic${muted ? ' muted' : ''}`}
-            onClick={() => setMuted(m => !m)}
+            onClick={toggleMute}
             title={muted ? 'Unmute' : 'Mute'}
           >
             🎙️
