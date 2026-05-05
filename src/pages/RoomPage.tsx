@@ -62,9 +62,11 @@ function buildInitialMessages(room: Room): ChatMessage[] {
   return msgs
 }
 
-function SpeakerNode({ name, color, initials, speaking, isHost }: {
-  name: string; color: string; initials: string; speaking: boolean; isHost: boolean
+function SpeakerNode({ name, color, initials, avatarUrl, speaking, isHost }: {
+  name: string; color: string; initials: string; avatarUrl?: string | null; speaking: boolean; isHost: boolean
 }) {
+  const [imgErrored, setImgErrored] = useState(false)
+  const showImage = !!avatarUrl && !imgErrored
   return (
     <div className="rp-speaker-node rp-fade-in">
       <div className="rp-speaker-ring-wrap">
@@ -76,10 +78,20 @@ function SpeakerNode({ name, color, initials, speaking, isHost }: {
         )}
         <div
           className={`rp-speaker-av${speaking ? ' speaking' : ''}`}
-          style={{ background: color }}
+          style={{ background: showImage ? 'transparent' : color, overflow: 'hidden', position: 'relative' }}
         >
           {isHost && <span className="rp-speaker-crown">👑</span>}
-          {initials}
+          {showImage ? (
+            <img
+              src={avatarUrl ?? undefined}
+              alt=""
+              referrerPolicy="no-referrer"
+              onError={() => setImgErrored(true)}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          ) : (
+            initials
+          )}
         </div>
       </div>
       {speaking ? (
@@ -104,7 +116,22 @@ function RoomCard({ room, active, onClick }: { room: Room; active: boolean; onCl
       </div>
       <div className="rp-room-avatars" style={{ marginBottom: 8 }}>
         {room.speakers.map((sp, i) => (
-          <div key={i} className="rp-room-av" style={{ background: sp.color }}>{sp.initial}</div>
+          <div
+            key={i}
+            className="rp-room-av"
+            style={{ background: sp.avatarUrl ? 'transparent' : sp.color, overflow: 'hidden' }}
+          >
+            {sp.avatarUrl ? (
+              <img
+                src={sp.avatarUrl}
+                alt=""
+                referrerPolicy="no-referrer"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              sp.initial
+            )}
+          </div>
         ))}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -142,10 +169,23 @@ export default function RoomPage() {
 
   const [sidebarOpen, setSidebarOpen]   = useState(true)
   const [chatOpen, setChatOpen]         = useState(false)
+  const [requestsOpen, setRequestsOpen] = useState(false)
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
   const [sidebarSearch, setSidebarSearch] = useState('')
-  const { connected, muted, remotes, error: voiceError, toggleMute } =
-    useVoice(apiRoom?.publicId)
+  const {
+    connected,
+    muted,
+    remotes,
+    error: voiceError,
+    toggleMute,
+    speakerUserIds,
+    myRole,
+    pendingHands,
+    handRaised,
+    raiseHand,
+    approveHand,
+    denyHand,
+  } = useVoice(apiRoom?.publicId, user?.id)
   const [activeSpeaker, setActiveSpeaker] = useState(0)
   const [msgs, setMsgs]                 = useState<ChatMessage[]>([])
   const [inputVal, setInputVal]         = useState('')
@@ -263,23 +303,72 @@ export default function RoomPage() {
 
   const isHost = !!user && apiRoom.host.id === user.id
 
-  const speakers = room.speakers.map((s, i) => ({ ...s, speaking: i === activeSpeaker }))
-  // Listeners = real-time peers minus the host (who's rendered in Speakers),
-  // plus the current user if they're not the host (remotes never includes self).
-  const hostUsername = apiRoom.host.username
+  // Build speaker entries: host first (from apiRoom) only if they're actually
+  // present (in speakerUserIds), then approved non-host speakers. If we ARE
+  // the host, treat ourselves as present immediately — otherwise we'd flicker
+  // through the listener section while waiting for the initial speakers-state.
+  const hostPresent = isHost || speakerUserIds.has(apiRoom.host.id)
+  const hostSpeaker = hostPresent
+    ? {
+        key: `speaker-${apiRoom.host.id}`,
+        initial: (apiRoom.host.name?.[0] ?? apiRoom.host.username[0] ?? '?').toUpperCase(),
+        color: room.speakers[0]?.color ?? '#6366f1',
+        name: apiRoom.host.name || apiRoom.host.username,
+        avatarUrl: apiRoom.host.avatarUrl,
+        isHost: true,
+        isSelf: !!user && user.id === apiRoom.host.id,
+      }
+    : null
+  const otherSpeakers = Array.from(speakerUserIds)
+    .filter(uid => uid !== apiRoom.host.id)
+    // Skip ghosts: a speaker userId with no live peer connection and that
+    // isn't us. Guards against role-changed-listener arriving after peer-left.
+    .filter(uid => uid === user?.id || remotes.some(r => r.userId === uid))
+    .map(uid => {
+      if (user && uid === user.id) {
+        return {
+          key: `speaker-${uid}`,
+          initial: (user.name?.[0] ?? user.username[0] ?? '?').toUpperCase(),
+          color: colorForPeer(uid),
+          name: user.name || user.username,
+          avatarUrl: user.avatarUrl,
+          isHost: false,
+          isSelf: true,
+        }
+      }
+      const peer = remotes.find(r => r.userId === uid)
+      return {
+        key: `speaker-${uid}`,
+        initial: (peer?.username?.[0] ?? '?').toUpperCase(),
+        color: colorForPeer(uid),
+        name: peer?.username ?? 'Speaker',
+        avatarUrl: peer?.avatarUrl ?? null,
+        isHost: false,
+        isSelf: false,
+      }
+    })
+  const speakerList = hostSpeaker ? [hostSpeaker, ...otherSpeakers] : otherSpeakers
+  const speakers = speakerList.map((s, i) => ({
+    ...s,
+    speaking: speakerList.length > 0 && i === activeSpeaker % speakerList.length,
+  }))
+
+  // Listeners = peers (and self) whose userId is not in the speaker set.
   const remoteListeners = remotes
-    .filter(r => r.username !== hostUsername)
+    .filter(r => !r.userId || !speakerUserIds.has(r.userId))
     .map(r => ({
       key: r.peerId,
       initial: (r.username?.[0] ?? '?').toUpperCase(),
-      color: colorForPeer(r.peerId),
+      color: colorForPeer(r.userId ?? r.peerId),
+      avatarUrl: r.avatarUrl,
       isSelf: false,
     }))
-  const selfListener = user && !isHost
+  const selfListener = user && myRole === 'listener' && !isHost
     ? {
         key: `self-${user.id}`,
         initial: (user.name?.[0] ?? user.username[0] ?? '?').toUpperCase(),
         color: colorForPeer(user.id),
+        avatarUrl: user.avatarUrl,
         isSelf: true,
       }
     : null
@@ -359,7 +448,7 @@ export default function RoomPage() {
                 <span key={i} className={`rp-stage-tag ${TAG_CLASSES[t.color]}`}>{t.label}</span>
               ))}
               <span className="rp-stage-tag" style={{ background: 'oklch(70% 0.18 152 / 0.1)', color: 'var(--color-green)', borderColor: 'oklch(70% 0.18 152 / 0.2)' }}>
-                🟢 Live · {room.listeners + room.speakers.length}
+                🟢 Live · {speakers.length + allListeners.length}
               </span>
             </div>
           </div>
@@ -385,14 +474,15 @@ export default function RoomPage() {
         <div className="rp-speaker-stage">
           <div className="rp-speaker-section-label">Speaking</div>
           <div className="rp-speaker-grid">
-            {speakers.map((sp, i) => (
+            {speakers.map(sp => (
               <SpeakerNode
-                key={i}
+                key={sp.key}
                 name={sp.name}
                 color={sp.color}
                 initials={sp.initial}
+                avatarUrl={sp.avatarUrl}
                 speaking={sp.speaking ?? false}
-                isHost={i === 0}
+                isHost={sp.isHost}
               />
             ))}
           </div>
@@ -406,10 +496,19 @@ export default function RoomPage() {
               <div
                 key={l.key}
                 className="rp-listener-av"
-                style={{ background: l.color }}
+                style={{ background: l.avatarUrl ? 'transparent' : l.color, overflow: 'hidden' }}
                 title={l.isSelf ? 'You' : undefined}
               >
-                {l.initial}
+                {l.avatarUrl ? (
+                  <img
+                    src={l.avatarUrl}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                ) : (
+                  l.initial
+                )}
               </div>
             ))}
             {extraListeners > 0 && (
@@ -419,7 +518,16 @@ export default function RoomPage() {
               <div style={{ fontSize: 12, color: 'var(--text-d)' }}>No listeners yet</div>
             )}
           </div>
-          <button className="rp-raise-hand-btn">✋ Request to Talk</button>
+          {myRole === 'listener' && !isHost && (
+            <button
+              className="rp-raise-hand-btn"
+              onClick={raiseHand}
+              disabled={handRaised}
+              style={handRaised ? { opacity: 0.6, cursor: 'default' } : undefined}
+            >
+              {handRaised ? '✋ Waiting for host…' : '✋ Request to Talk'}
+            </button>
+          )}
         </div>
 
         {/* Hidden audio sinks for remote peers — autoplay starts after user
@@ -437,16 +545,115 @@ export default function RoomPage() {
 
         {/* Controls */}
         <div className="rp-controls">
-          <button
-            className={`rp-ctrl-mic${muted ? ' muted' : ''}`}
-            onClick={toggleMute}
-            title={muted ? 'Unmute' : 'Mute'}
-          >
-            🎙️
-          </button>
+          {myRole === 'speaker' && (
+            <button
+              className={`rp-ctrl-mic${muted ? ' muted' : ''}`}
+              onClick={toggleMute}
+              title={muted ? 'Unmute' : 'Mute'}
+            >
+              🎙️
+            </button>
+          )}
           <button type="button" className={`rp-ctrl-btn${chatOpen ? ' active' : ''}`} title="Chat" onClick={() => setChatOpen(o => !o)}>💬</button>
           <div className="rp-ctrl-btn" title="Video">📹</div>
           <div className="rp-ctrl-btn" title="Screen share">🖥️</div>
+          {isHost && (
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                className={`rp-ctrl-btn${requestsOpen ? ' active' : ''}`}
+                title="Hand requests"
+                onClick={() => setRequestsOpen(o => !o)}
+                style={{ position: 'relative' }}
+              >
+                ✋
+                {pendingHands.length > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: -4, right: -4,
+                    minWidth: 18, height: 18,
+                    padding: '0 5px',
+                    borderRadius: 9,
+                    background: 'oklch(62% 0.22 15)',
+                    color: 'white',
+                    fontSize: 11, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    lineHeight: 1,
+                  }}>
+                    {pendingHands.length}
+                  </span>
+                )}
+              </button>
+              {requestsOpen && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 'calc(100% + 8px)',
+                  right: 0,
+                  width: 280,
+                  background: 'var(--color-bg-elev)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 10,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                  padding: 10,
+                  zIndex: 40,
+                  display: 'flex', flexDirection: 'column', gap: 6,
+                }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-d)', textTransform: 'uppercase', letterSpacing: 0.5, padding: '2px 4px' }}>
+                    Hand requests {pendingHands.length > 0 ? `(${pendingHands.length})` : ''}
+                  </div>
+                  {pendingHands.length === 0 ? (
+                    <div style={{ fontSize: 13, color: 'var(--text-d)', padding: '8px 4px' }}>
+                      No requests yet
+                    </div>
+                  ) : (
+                    pendingHands.map(h => (
+                      <div
+                        key={h.userId}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px' }}
+                      >
+                        <div
+                          className="rp-listener-av"
+                          style={{
+                            background: h.avatarUrl ? 'transparent' : colorForPeer(h.userId),
+                            width: 28, height: 28, fontSize: 12, flexShrink: 0,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {h.avatarUrl ? (
+                            <img
+                              src={h.avatarUrl}
+                              alt=""
+                              referrerPolicy="no-referrer"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                          ) : (
+                            (h.username?.[0] ?? '?').toUpperCase()
+                          )}
+                        </div>
+                        <span style={{ flex: 1, fontSize: 13, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {h.username ?? 'Unknown'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => approveHand(h.userId)}
+                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: 12, background: 'oklch(70% 0.18 152)', color: 'white', border: 'none', cursor: 'pointer' }}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => denyHand(h.userId)}
+                          style={{ padding: '4px 8px', borderRadius: 6, fontSize: 12, background: 'transparent', color: 'var(--text-d)', border: '1px solid var(--color-border)', cursor: 'pointer' }}
+                        >
+                          Deny
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

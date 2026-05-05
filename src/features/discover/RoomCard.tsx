@@ -60,6 +60,7 @@ function RoomCard({ room, index }: RoomCardProps) {
               <Avatar
                 key={i}
                 initial={sp.initial}
+                src={sp.avatarUrl}
                 size={36}
                 speaking={sp.speaking}
                 title={sp.name}

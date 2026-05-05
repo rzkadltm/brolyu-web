@@ -72,10 +72,23 @@ function RoomCard({ room, index }: { room: Room; index: number }) {
               <div
                 key={i}
                 className={`ap-speaker-av${sp.speaking ? ' speaking' : ''}`}
-                style={{ background: sp.color, zIndex: room.speakers.length - i }}
+                style={{
+                  background: sp.avatarUrl ? 'transparent' : sp.color,
+                  zIndex: room.speakers.length - i,
+                  overflow: 'hidden',
+                }}
                 title={sp.name}
               >
-                {sp.initial}
+                {sp.avatarUrl ? (
+                  <img
+                    src={sp.avatarUrl}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                ) : (
+                  sp.initial
+                )}
               </div>
             ))}
           </div>

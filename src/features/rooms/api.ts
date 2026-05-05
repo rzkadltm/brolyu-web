@@ -12,6 +12,7 @@ export interface ApiRoom {
     name: string
     avatarUrl: string | null
   }
+  hostPresent: boolean
   primaryLangCode: string | null
   visibility: 'public' | 'unlisted' | 'private'
   status: 'live' | 'ended' | 'cancelled'
@@ -97,19 +98,26 @@ export function apiRoomToUiRoom(r: ApiRoom): Room {
   const initial = (r.host.name?.[0] ?? r.host.username[0] ?? '?').toUpperCase()
   const tagColor: TagColor = pickTagColor(r.category?.slug)
 
+  // No speaker tile when the host isn't actually connected — the room card
+  // should look "empty" rather than implying a phantom presence.
+  const speakers = r.hostPresent
+    ? [
+        {
+          initial,
+          color: from,
+          name: r.host.name || r.host.username,
+          avatarUrl: r.host.avatarUrl,
+          speaking: r.status === 'live',
+        },
+      ]
+    : []
+
   return {
     id: r.publicId,
     name: r.name,
     live: r.status === 'live',
     strip: `linear-gradient(90deg,${from},${to})`,
-    speakers: [
-      {
-        initial,
-        color: from,
-        name: r.host.name || r.host.username,
-        speaking: r.status === 'live',
-      },
-    ],
+    speakers,
     tags: r.category
       ? [{ label: r.category.label, color: tagColor }]
       : [],

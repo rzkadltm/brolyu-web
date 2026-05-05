@@ -1,13 +1,39 @@
+import { useEffect, useState } from 'react'
 import Chip from '../../components/Chip/Chip'
 import SearchInput from '../../components/SearchInput/SearchInput'
 import { useTheme } from '../../contexts/useTheme'
-import { ROOMS } from '../../data/rooms'
+import type { Room } from '../../data/rooms'
+import { apiRoomToUiRoom, roomsApi } from '../rooms/api'
 import RoomCard from './RoomCard'
 import { useRoomFilter } from './useRoomFilter'
 
 function DiscoverPage() {
   const { theme, toggleTheme } = useTheme()
-  const { filter, setFilter, search, setSearch, filtered, liveCount, FILTERS } = useRoomFilter(ROOMS)
+  const [rooms, setRooms] = useState<Room[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    roomsApi
+      .list()
+      .then(list => {
+        if (cancelled) return
+        setRooms(list.map(apiRoomToUiRoom))
+        setLoadError(null)
+      })
+      .catch(err => {
+        if (cancelled) return
+        setLoadError(err instanceof Error ? err.message : 'Failed to load rooms')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  const { filter, setFilter, search, setSearch, filtered, liveCount, FILTERS } = useRoomFilter(rooms)
 
   return (
     <>
@@ -45,28 +71,41 @@ function DiscoverPage() {
 
       <div className="ap-rooms-scroll flex-1 overflow-y-auto px-4 md:px-8 pb-8">
         <div className="ap-section-label">
-          {filter === 'All'
-            ? `${liveCount} live rooms`
-            : `${filtered.length} rooms · ${filter}`}
+          {loading
+            ? 'Loading rooms…'
+            : filter === 'All'
+              ? `${liveCount} live rooms`
+              : `${filtered.length} rooms · ${filter}`}
         </div>
+        {loadError && !loading && (
+          <div className="text-center py-10 text-[14px]" style={{ color: 'oklch(62% 0.22 15)' }}>
+            ⚠ {loadError}
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((room, i) => (
             <RoomCard key={room.id} room={room} index={i} />
           ))}
         </div>
-        {filtered.length === 0 && (
+        {!loading && !loadError && filtered.length === 0 && (
           <div
             className="text-center py-20 text-[14px]"
             style={{ color: 'var(--text-d)' }}
           >
-            No rooms found for &ldquo;{search || filter}&rdquo; —{' '}
-            <button
-              type="button"
-              className="text-accent cursor-pointer bg-transparent border-0 p-0 font-inherit"
-              onClick={() => { setSearch(''); setFilter('All') }}
-            >
-              clear filters
-            </button>
+            {rooms.length === 0 ? (
+              <>No live rooms yet — be the first to create one.</>
+            ) : (
+              <>
+                No rooms found for &ldquo;{search || filter}&rdquo; —{' '}
+                <button
+                  type="button"
+                  className="text-accent cursor-pointer bg-transparent border-0 p-0 font-inherit"
+                  onClick={() => { setSearch(''); setFilter('All') }}
+                >
+                  clear filters
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

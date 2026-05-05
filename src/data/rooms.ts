@@ -4,6 +4,7 @@ export type Speaker = {
   initial: string
   color: string
   name: string
+  avatarUrl?: string | null
   speaking?: boolean
 }
 
