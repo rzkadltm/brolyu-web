@@ -1,3 +1,17 @@
+# [1.22.0](https://github.com/rzkadltm/brolyu-web/compare/v1.21.0...v1.22.0) (2026-05-05)
+
+
+### Bug Fixes
+
+* **voice:** queue ice candidates until remote description set ([c554521](https://github.com/rzkadltm/brolyu-web/commit/c554521f73336a9a79d1c8ff8574c06e0238188e))
+
+
+### Features
+
+* **rooms:** live discover, avatars, and voice hand-raise roles ([b874e5f](https://github.com/rzkadltm/brolyu-web/commit/b874e5f5eeb80302348a8ef60819255f3b2d1ca0))
+* **voice:** add webrtc voice chat to room page ([05913ff](https://github.com/rzkadltm/brolyu-web/commit/05913ff6ec2ad015b319f1a4425221861fe314f3))
+* **voice:** show real peers in room listener section ([9f19f01](https://github.com/rzkadltm/brolyu-web/commit/9f19f0143e9efa62eebc473eaee882afd95827af))
+
 # [1.21.0](https://github.com/rzkadltm/brolyu-web/compare/v1.20.2...v1.21.0) (2026-05-04)
 
 
