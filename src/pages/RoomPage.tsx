@@ -26,11 +26,15 @@ const TAG_CLASSES: Record<TagColor, string> = {
 
 const SIDEBAR_FILTERS = ['All Rooms', 'Language', 'Study', 'Games', 'Friends']
 
-const LISTENER_POOL = [
-  { i: 'T', c: '#f59e0b' }, { i: 'A', c: '#ec4899' }, { i: 'K', c: '#14b8a6' },
-  { i: 'R', c: '#8b5cf6' }, { i: 'S', c: '#f97316' }, { i: 'N', c: '#6366f1' },
-  { i: 'B', c: '#ef4444' },
+const LISTENER_COLORS = [
+  '#f59e0b', '#ec4899', '#14b8a6', '#8b5cf6', '#f97316', '#6366f1', '#ef4444',
 ]
+
+function colorForPeer(peerId: string): string {
+  let h = 0
+  for (let i = 0; i < peerId.length; i++) h = (h * 31 + peerId.charCodeAt(i)) | 0
+  return LISTENER_COLORS[Math.abs(h) % LISTENER_COLORS.length]
+}
 
 const STAGE_WAVE_HEIGHTS = [8, 13, 6, 13, 8]
 const STAGE_WAVE_DELAYS  = [0, 0.15, 0.3, 0.15, 0]
@@ -260,8 +264,28 @@ export default function RoomPage() {
   const isHost = !!user && apiRoom.host.id === user.id
 
   const speakers = room.speakers.map((s, i) => ({ ...s, speaking: i === activeSpeaker }))
-  const visibleListeners = LISTENER_POOL.slice(0, Math.min(6, room.listeners))
-  const extraListeners = room.listeners - visibleListeners.length
+  // Listeners = real-time peers minus the host (who's rendered in Speakers),
+  // plus the current user if they're not the host (remotes never includes self).
+  const hostUsername = apiRoom.host.username
+  const remoteListeners = remotes
+    .filter(r => r.username !== hostUsername)
+    .map(r => ({
+      key: r.peerId,
+      initial: (r.username?.[0] ?? '?').toUpperCase(),
+      color: colorForPeer(r.peerId),
+      isSelf: false,
+    }))
+  const selfListener = user && !isHost
+    ? {
+        key: `self-${user.id}`,
+        initial: (user.name?.[0] ?? user.username[0] ?? '?').toUpperCase(),
+        color: colorForPeer(user.id),
+        isSelf: true,
+      }
+    : null
+  const allListeners = selfListener ? [selfListener, ...remoteListeners] : remoteListeners
+  const visibleListeners = allListeners.slice(0, 6)
+  const extraListeners = Math.max(0, allListeners.length - visibleListeners.length)
 
   return (
     <div className="relative" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -378,11 +402,21 @@ export default function RoomPage() {
         <div className="rp-listener-section">
           <div className="rp-listener-label">Listening</div>
           <div className="rp-listener-avatars">
-            {visibleListeners.map((l, i) => (
-              <div key={i} className="rp-listener-av" style={{ background: l.c }}>{l.i}</div>
+            {visibleListeners.map(l => (
+              <div
+                key={l.key}
+                className="rp-listener-av"
+                style={{ background: l.color }}
+                title={l.isSelf ? 'You' : undefined}
+              >
+                {l.initial}
+              </div>
             ))}
             {extraListeners > 0 && (
               <div className="rp-listener-more">+{extraListeners}</div>
+            )}
+            {allListeners.length === 0 && (
+              <div style={{ fontSize: 12, color: 'var(--text-d)' }}>No listeners yet</div>
             )}
           </div>
           <button className="rp-raise-hand-btn">✋ Request to Talk</button>

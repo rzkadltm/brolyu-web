@@ -57,12 +57,22 @@ export function useVoice(roomId: string | undefined) {
   const ensurePeer = useCallback(
     (peerId: string, username: string | null): PeerEntry => {
       const existing = peersRef.current.get(peerId)
-      if (existing) return existing
+      if (existing) {
+        // Backfill username if signal-driven creation got there first with null.
+        if (!existing.username && username) {
+          existing.username = username
+          refreshRemotes()
+        }
+        return existing
+      }
 
       const pc = new RTCPeerConnection({ iceServers: iceServersRef.current })
       const stream = new MediaStream()
       const entry: PeerEntry = { pc, username, stream, pendingIce: [] }
       peersRef.current.set(peerId, entry)
+      // Surface the peer to the UI now — don't wait for ontrack, otherwise
+      // listeners only appear after WebRTC negotiation completes.
+      refreshRemotes()
 
       const local = localStreamRef.current
       if (local) {
