@@ -13,6 +13,7 @@ interface PeerEntry {
   pc: RTCPeerConnection
   username: string | null
   stream: MediaStream
+  pendingIce: RTCIceCandidateInit[]
 }
 
 interface PeerInfo {
@@ -60,7 +61,7 @@ export function useVoice(roomId: string | undefined) {
 
       const pc = new RTCPeerConnection({ iceServers: iceServersRef.current })
       const stream = new MediaStream()
-      const entry: PeerEntry = { pc, username, stream }
+      const entry: PeerEntry = { pc, username, stream, pendingIce: [] }
       peersRef.current.set(peerId, entry)
 
       const local = localStreamRef.current
@@ -186,6 +187,8 @@ export function useVoice(roomId: string | undefined) {
           try {
             if (msg.type === 'offer' && msg.sdp) {
               await pc.setRemoteDescription({ type: 'offer', sdp: msg.sdp })
+              for (const c of entry.pendingIce) await pc.addIceCandidate(c)
+              entry.pendingIce.length = 0
               const answer = await pc.createAnswer()
               await pc.setLocalDescription(answer)
               socket.emit('signal', {
@@ -195,8 +198,11 @@ export function useVoice(roomId: string | undefined) {
               })
             } else if (msg.type === 'answer' && msg.sdp) {
               await pc.setRemoteDescription({ type: 'answer', sdp: msg.sdp })
+              for (const c of entry.pendingIce) await pc.addIceCandidate(c)
+              entry.pendingIce.length = 0
             } else if (msg.type === 'ice' && msg.candidate) {
-              await pc.addIceCandidate(msg.candidate)
+              if (pc.remoteDescription) await pc.addIceCandidate(msg.candidate)
+              else entry.pendingIce.push(msg.candidate)
             }
           } catch (err) {
             if (!cancelled)
