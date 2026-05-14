@@ -590,8 +590,14 @@ export default function RoomPage() {
               </span>
             )}
           </button>
-          <div className="rp-ctrl-btn" title="Video">📹</div>
-          <div className="rp-ctrl-btn" title="Screen share">🖥️</div>
+          <div style={{ position: 'relative', display: 'inline-flex' }}>
+            <div className="rp-ctrl-btn" title="Video">📹</div>
+            <span style={{ position: 'absolute', top: -4, right: -4, background: 'oklch(62% 0.22 15)', color: 'white', fontSize: 7, fontWeight: 700, padding: '1px 3px', borderRadius: 4, lineHeight: 1.4, pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: 0.2 }}>soon</span>
+          </div>
+          <div style={{ position: 'relative', display: 'inline-flex' }}>
+            <div className="rp-ctrl-btn" title="Screen share">🖥️</div>
+            <span style={{ position: 'absolute', top: -4, right: -4, background: 'oklch(62% 0.22 15)', color: 'white', fontSize: 7, fontWeight: 700, padding: '1px 3px', borderRadius: 4, lineHeight: 1.4, pointerEvents: 'none', textTransform: 'uppercase', letterSpacing: 0.2 }}>soon</span>
+          </div>
           {isHost && (
             <div style={{ position: 'relative' }}>
               <button

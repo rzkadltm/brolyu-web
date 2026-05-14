@@ -15,7 +15,6 @@ function DiscoverPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
     roomsApi
       .list()
       .then(list => {

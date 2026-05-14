@@ -71,7 +71,7 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
   const peersRef = useRef<Map<string, PeerEntry>>(new Map())
   const iceServersRef = useRef<IceServer[]>([])
   const selfUserIdRef = useRef<string | undefined>(selfUserId)
-  selfUserIdRef.current = selfUserId
+  useEffect(() => { selfUserIdRef.current = selfUserId }, [selfUserId])
 
   const myRole: 'speaker' | 'listener' =
     selfUserId && speakerUserIds.has(selfUserId) ? 'speaker' : 'listener'
