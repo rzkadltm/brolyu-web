@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/rzkadltm/brolyu-web/compare/v1.22.0...v1.23.0) (2026-05-14)
+
+
+### Features
+
+* **voice:** add real-time chat with unread badge ([81c2ced](https://github.com/rzkadltm/brolyu-web/commit/81c2ced172e1394e519fb191bdb963452cafceb5))
+
 # [1.22.0](https://github.com/rzkadltm/brolyu-web/compare/v1.21.0...v1.22.0) (2026-05-05)
 
 
