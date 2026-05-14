@@ -1,3 +1,10 @@
+# [1.25.0](https://github.com/rzkadltm/brolyu-web/compare/v1.24.0...v1.25.0) (2026-05-14)
+
+
+### Features
+
+* **voice:** real-time VAD speaking indicators ([5cf62e6](https://github.com/rzkadltm/brolyu-web/commit/5cf62e641c7fdfa506ff034862f8f312d7aea400))
+
 # [1.24.0](https://github.com/rzkadltm/brolyu-web/compare/v1.23.0...v1.24.0) (2026-05-14)
 
 
