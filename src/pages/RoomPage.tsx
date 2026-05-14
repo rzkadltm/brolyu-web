@@ -179,8 +179,8 @@ export default function RoomPage() {
     denyHand,
     chatMsgs,
     sendChatMessage,
+    talkingUserIds,
   } = useVoice(apiRoom?.publicId, user?.id)
-  const [activeSpeaker, setActiveSpeaker] = useState(0)
   const [msgs, setMsgs]                 = useState<ChatMessage[]>([{ id: 0, type: 'sys', text: 'You joined the room' }])
   const [inputVal, setInputVal]         = useState('')
   const [copied, setCopied]             = useState(false)
@@ -226,12 +226,6 @@ export default function RoomPage() {
       cancelled = true
     }
   }, [])
-
-  useEffect(() => {
-    if (!room) return
-    const t = setInterval(() => setActiveSpeaker(s => (s + 1) % room.speakers.length), 2800)
-    return () => clearInterval(t)
-  }, [room])
 
   async function handleEndRoom() {
     if (!apiRoom || endingRoom) return
@@ -338,6 +332,7 @@ export default function RoomPage() {
         avatarUrl: apiRoom.host.avatarUrl,
         isHost: true,
         isSelf: !!user && user.id === apiRoom.host.id,
+        userId: apiRoom.host.id,
       }
     : null
   const otherSpeakers = Array.from(speakerUserIds)
@@ -355,6 +350,7 @@ export default function RoomPage() {
           avatarUrl: user.avatarUrl,
           isHost: false,
           isSelf: true,
+          userId: uid,
         }
       }
       const peer = remotes.find(r => r.userId === uid)
@@ -366,12 +362,13 @@ export default function RoomPage() {
         avatarUrl: peer?.avatarUrl ?? null,
         isHost: false,
         isSelf: false,
+        userId: uid,
       }
     })
   const speakerList = hostSpeaker ? [hostSpeaker, ...otherSpeakers] : otherSpeakers
-  const speakers = speakerList.map((s, i) => ({
+  const speakers = speakerList.map(s => ({
     ...s,
-    speaking: speakerList.length > 0 && i === activeSpeaker % speakerList.length,
+    speaking: talkingUserIds.has(s.userId),
   }))
 
   // Listeners = peers (and self) whose userId is not in the speaker set.

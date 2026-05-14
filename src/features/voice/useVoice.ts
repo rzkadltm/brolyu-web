@@ -65,6 +65,8 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
   const [pendingHands, setPendingHands] = useState<PendingHand[]>([])
   const [handRaised, setHandRaised] = useState(false)
   const [chatMsgs, setChatMsgs] = useState<ChatMsg[]>([])
+  const [talkingUserIds, setTalkingUserIds] = useState<Set<string>>(new Set())
+  const vadMapRef = useRef<Map<string, { ctx: AudioContext; timer: number }>>(new Map())
 
   const socketRef = useRef<Socket | null>(null)
   const localStreamRef = useRef<MediaStream | null>(null)
@@ -131,6 +133,31 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
           if (!stream.getTracks().includes(t)) stream.addTrack(t)
         })
         refreshRemotes()
+        if (!vadMapRef.current.has(peerId)) {
+          try {
+            const vadCtx = new AudioContext()
+            void vadCtx.resume()
+            const src = vadCtx.createMediaStreamSource(remoteStream)
+            const analyser = vadCtx.createAnalyser()
+            analyser.fftSize = 512
+            src.connect(analyser)
+            const buf = new Uint8Array(analyser.frequencyBinCount)
+            const timer = setInterval(() => {
+              analyser.getByteFrequencyData(buf)
+              const rms = buf.reduce((a, b) => a + b, 0) / buf.length
+              const uid = peersRef.current.get(peerId)?.userId
+              if (!uid) return
+              setTalkingUserIds(prev => {
+                const talking = rms > 10
+                if (talking === prev.has(uid)) return prev
+                const next = new Set(prev)
+                talking ? next.add(uid) : next.delete(uid)
+                return next
+              })
+            }, 100)
+            vadMapRef.current.set(peerId, { ctx: vadCtx, timer })
+          } catch { /* VAD unavailable */ }
+        }
       }
 
       pc.onicecandidate = (e) => {
@@ -162,6 +189,14 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
     (peerId: string) => {
       const entry = peersRef.current.get(peerId)
       if (entry) entry.pc.close()
+      const vadEntry = vadMapRef.current.get(peerId)
+      if (vadEntry) {
+        clearInterval(vadEntry.timer)
+        void vadEntry.ctx.close()
+        vadMapRef.current.delete(peerId)
+      }
+      const uid = entry?.userId
+      if (uid) setTalkingUserIds(prev => { const n = new Set(prev); n.delete(uid); return n })
       peersRef.current.delete(peerId)
       refreshRemotes()
     },
@@ -184,6 +219,30 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
         }
         stream.getAudioTracks().forEach((t) => { t.enabled = false })
         localStreamRef.current = stream
+
+        try {
+          const selfVadCtx = new AudioContext()
+          void selfVadCtx.resume()
+          const selfSrc = selfVadCtx.createMediaStreamSource(stream)
+          const selfAnalyser = selfVadCtx.createAnalyser()
+          selfAnalyser.fftSize = 512
+          selfSrc.connect(selfAnalyser)
+          const selfBuf = new Uint8Array(selfAnalyser.frequencyBinCount)
+          const selfTimer = setInterval(() => {
+            selfAnalyser.getByteFrequencyData(selfBuf)
+            const rms = selfBuf.reduce((a, b) => a + b, 0) / selfBuf.length
+            const uid = selfUserIdRef.current
+            if (!uid) return
+            setTalkingUserIds(prev => {
+              const talking = rms > 10
+              if (talking === prev.has(uid)) return prev
+              const next = new Set(prev)
+              talking ? next.add(uid) : next.delete(uid)
+              return next
+            })
+          }, 100)
+          vadMapRef.current.set('self', { ctx: selfVadCtx, timer: selfTimer })
+        } catch { /* VAD unavailable */ }
 
         const ice = await voiceApi.turnCredentials()
         if (cancelled) return
@@ -322,6 +381,11 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
       peersRef.current.clear()
       localStreamRef.current?.getTracks().forEach((t) => t.stop())
       localStreamRef.current = null
+      vadMapRef.current.forEach(({ ctx, timer }) => {
+        clearInterval(timer)
+        void ctx.close()
+      })
+      vadMapRef.current.clear()
       setConnected(false)
       setRemotes([])
       setSpeakerUserIds(new Set())
@@ -329,6 +393,7 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
       setHandRaised(false)
       setMuted(true)
       setChatMsgs([])
+      setTalkingUserIds(new Set())
     }
   }, [roomId, ensurePeer, dropPeer])
 
@@ -394,5 +459,6 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
     denyHand,
     chatMsgs,
     sendChatMessage,
+    talkingUserIds,
   }
 }
