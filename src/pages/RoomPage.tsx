@@ -4,7 +4,7 @@ import { SEO } from '../components/SEO'
 import type { Room } from '../data/rooms'
 import { useAuth } from '../contexts/useAuth'
 import { apiRoomToUiRoom, roomsApi, type ApiRoom } from '../features/rooms/api'
-import { useVoice } from '../features/voice/useVoice'
+import { useVoice, type ChatMsg } from '../features/voice/useVoice'
 
 function RemoteAudio({ stream }: { stream: MediaStream }) {
   const ref = useRef<HTMLAudioElement>(null)
@@ -52,15 +52,6 @@ type ChatMessage = {
   correction?: string
 }
 
-function buildInitialMessages(room: Room): ChatMessage[] {
-  const sp = room.speakers
-  const msgs: ChatMessage[] = []
-  if (sp[0]) msgs.push({ id: 1, type: 'chat', name: sp[0].name, color: sp[0].color, initials: sp[0].initial, text: 'Hey everyone! Welcome to the room 👋', time: '14:30', me: false })
-  if (sp[1]) msgs.push({ id: 2, type: 'chat', name: sp[1].name, color: sp[1].color, initials: sp[1].initial, text: 'Happy to be here! Let\'s get started 😊', time: '14:31', me: false })
-  if (sp[2]) msgs.push({ id: 3, type: 'chat', name: sp[2].name, color: sp[2].color, initials: sp[2].initial, text: 'Same here! This is my first time in this room.', time: '14:32', me: false })
-  msgs.push({ id: 4, type: 'sys', text: 'You joined the room' })
-  return msgs
-}
 
 function SpeakerNode({ name, color, initials, avatarUrl, speaking, isHost }: {
   name: string; color: string; initials: string; avatarUrl?: string | null; speaking: boolean; isHost: boolean
@@ -169,6 +160,7 @@ export default function RoomPage() {
 
   const [sidebarOpen, setSidebarOpen]   = useState(true)
   const [chatOpen, setChatOpen]         = useState(false)
+  const [unreadCount, setUnreadCount]   = useState(0)
   const [requestsOpen, setRequestsOpen] = useState(false)
   const [sidebarFilter, setSidebarFilter] = useState('All Rooms')
   const [sidebarSearch, setSidebarSearch] = useState('')
@@ -185,12 +177,15 @@ export default function RoomPage() {
     raiseHand,
     approveHand,
     denyHand,
+    chatMsgs,
+    sendChatMessage,
   } = useVoice(apiRoom?.publicId, user?.id)
   const [activeSpeaker, setActiveSpeaker] = useState(0)
-  const [msgs, setMsgs]                 = useState<ChatMessage[]>([])
+  const [msgs, setMsgs]                 = useState<ChatMessage[]>([{ id: 0, type: 'sys', text: 'You joined the room' }])
   const [inputVal, setInputVal]         = useState('')
   const [copied, setCopied]             = useState(false)
   const msgsEndRef = useRef<HTMLDivElement>(null)
+  const chatMsgsLenRef = useRef(0)
 
   useEffect(() => {
     if (!id) return
@@ -202,7 +197,6 @@ export default function RoomPage() {
         const ui = apiRoomToUiRoom(api)
         setApiRoom(api)
         setRoom(ui)
-        setMsgs(buildInitialMessages(ui))
       })
       .catch(() => {
         if (cancelled) return
@@ -252,7 +246,27 @@ export default function RoomPage() {
 
   useEffect(() => {
     msgsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [msgs])
+  }, [msgs, chatOpen])
+
+  useEffect(() => {
+    const newMsgs = chatMsgs.slice(chatMsgsLenRef.current)
+    chatMsgsLenRef.current = chatMsgs.length
+    if (newMsgs.length === 0) return
+    setMsgs(m => [
+      ...m,
+      ...newMsgs.map((cm: ChatMsg) => ({
+        id: cm.ts,
+        type: 'chat' as const,
+        name: cm.username ?? 'Unknown',
+        color: colorForPeer(cm.userId ?? cm.username ?? ''),
+        initials: (cm.username?.[0] ?? '?').toUpperCase(),
+        text: cm.text,
+        time: new Date(cm.ts).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' }),
+        me: false,
+      })),
+    ])
+    if (!chatOpen) setUnreadCount(c => c + newMsgs.length)
+  }, [chatMsgs, chatOpen])
 
   function copyLink() {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -263,12 +277,19 @@ export default function RoomPage() {
 
   function sendMsg() {
     if (!inputVal.trim()) return
+    const text = inputVal.trim()
+    const now = Date.now()
     setMsgs(m => [...m, {
-      id: Date.now(), type: 'chat', name: 'You', color: '#6366f1', initials: 'U',
-      text: inputVal.trim(),
-      time: new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' }),
+      id: now,
+      type: 'chat',
+      name: user?.name || user?.username || 'You',
+      color: colorForPeer(user?.id ?? 'me'),
+      initials: (user?.name?.[0] ?? user?.username?.[0] ?? 'U').toUpperCase(),
+      text,
+      time: new Date(now).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' }),
       me: true,
     }])
+    sendChatMessage(text)
     setInputVal('')
   }
 
@@ -554,7 +575,21 @@ export default function RoomPage() {
               🎙️
             </button>
           )}
-          <button type="button" className={`rp-ctrl-btn${chatOpen ? ' active' : ''}`} title="Chat" onClick={() => setChatOpen(o => !o)}>💬</button>
+          <button type="button" className={`rp-ctrl-btn${chatOpen ? ' active' : ''}`} title="Chat" onClick={() => { setChatOpen(o => !o); setUnreadCount(0) }} style={{ position: 'relative' }}>
+            💬
+            {unreadCount > 0 && !chatOpen && (
+              <span style={{
+                position: 'absolute', top: -4, right: -4,
+                minWidth: 18, height: 18, padding: '0 5px',
+                borderRadius: 9, background: 'oklch(62% 0.22 15)',
+                color: 'white', fontSize: 11, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                lineHeight: 1, pointerEvents: 'none',
+              }}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
           <div className="rp-ctrl-btn" title="Video">📹</div>
           <div className="rp-ctrl-btn" title="Screen share">🖥️</div>
           {isHost && (

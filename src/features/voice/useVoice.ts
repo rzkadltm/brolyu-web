@@ -40,6 +40,14 @@ export interface PendingHand {
   avatarUrl: string | null
 }
 
+export interface ChatMsg {
+  userId: string | null
+  username: string | null
+  avatarUrl: string | null
+  text: string
+  ts: number
+}
+
 const SOCKET_URL = (
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
 ).replace(/\/$/, '')
@@ -56,6 +64,7 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
   const [speakerUserIds, setSpeakerUserIds] = useState<Set<string>>(new Set())
   const [pendingHands, setPendingHands] = useState<PendingHand[]>([])
   const [handRaised, setHandRaised] = useState(false)
+  const [chatMsgs, setChatMsgs] = useState<ChatMsg[]>([])
 
   const socketRef = useRef<Socket | null>(null)
   const localStreamRef = useRef<MediaStream | null>(null)
@@ -262,6 +271,10 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
           setHandRaised(false)
         })
 
+        socket.on('chat-msg', (msg: ChatMsg) => {
+          setChatMsgs(prev => [...prev, msg])
+        })
+
         socket.on('signal', async (msg: SignalMsg) => {
           const entry = ensurePeer(msg.from, null, null, null)
           const pc = entry.pc
@@ -315,6 +328,7 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
       setPendingHands([])
       setHandRaised(false)
       setMuted(true)
+      setChatMsgs([])
     }
   }, [roomId, ensurePeer, dropPeer])
 
@@ -346,6 +360,10 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
     tracks.forEach((t) => { t.enabled = false })
   }, [speakerUserIds])
 
+  const sendChatMessage = useCallback((text: string) => {
+    socketRef.current?.emit('chat-msg', { text })
+  }, [])
+
   const raiseHand = useCallback(() => {
     if (!socketRef.current) return
     setHandRaised(true)
@@ -374,5 +392,7 @@ export function useVoice(roomId: string | undefined, selfUserId: string | undefi
     raiseHand,
     approveHand,
     denyHand,
+    chatMsgs,
+    sendChatMessage,
   }
 }
