@@ -1,3 +1,10 @@
+# [1.24.0](https://github.com/rzkadltm/brolyu-web/compare/v1.23.0...v1.24.0) (2026-05-14)
+
+
+### Features
+
+* **room:** soon badges on video/screenshare, discover and voice fixes ([8a4e3e9](https://github.com/rzkadltm/brolyu-web/commit/8a4e3e943ba7327127a76261980044cceae587e1))
+
 # [1.23.0](https://github.com/rzkadltm/brolyu-web/compare/v1.22.0...v1.23.0) (2026-05-14)
 
 
